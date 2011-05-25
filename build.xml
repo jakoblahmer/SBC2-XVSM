@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SBC2_XVSM" default="compile" basedir=".">
+	
+	<property name="src.dir" value="src"/>
+	<property name="build.dir" value="build"/>
+	<property name="lib.dir" value="lib"/>
+	<property name="libGlobal.dir" value="../sbc2_global/lib"/>
+	<property name="distGlobal.dir" value="../sbc2_global/dist"/>
+	<property name="res.dir" value="res"/>
+	<property name="config.file" value="mozartspaces.xml"/>
+	<property name="configServer.file" value="mozartspacesServer.xml"/>
+	<property name="spacePort" value="4242"/>
+	<property name="spaceURI" value="xvsm://localhost:${spacePort}"/>
+	
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+		<fileset dir="${libGlobal.dir}" includes="**/*.jar" />
+		<fileset dir="${distGlobal.dir}" includes="**/*.jar" />
+		<pathelement location="${build.dir}"/>
+	</path>
+	
+	<target name="compile">
+		<mkdir dir="${build.dir}"/>
+		<javac srcdir="${src.dir}"
+			   destdir="${build.dir}"
+			   debug="on"
+			   deprecation="on"
+			   classpathref="classpath"/>
+		<copy todir="${build.dir}">
+			<fileset dir="${res.dir}" includes="*.xml" />
+		</copy>
+		<copy file="${src.dir}/log4j.properties" tofile="${build.dir}/log4j.properties"/>
+		<copy file="${src.dir}/logback.xml" tofile="${build.dir}/logback.xml"/>
+	</target>
+
+	<!-- start space -->
+	<target name="run-space" depends="compile">
+		<java classname="sbc.spaceServer.Server"
+				fork="true"
+				classpathref="classpath">
+			<jvmarg value="-Dmozartspaces.configurationFile=${configServer.file}"/>
+			<arg line="${spaceURI}"/>
+		</java>
+	</target>
+	
+	<target name="run-admin" depends="compile">
+		<java classname="sbc.admin.Admin" 
+			fork="true"
+			classpathref="classpath">
+			<jvmarg value="-Dmozartspaces.configurationFile=${config.file}"/>
+			<arg line="${spaceURI}"/>
+		</java>
+	</target>
+	
+	<!-- SHOULD NOT BE USED DIRECTLY -->
+	<target name="run-chicken" depends="compile">
+		<java classname="sbc.producer.Chicken" 
+			fork="true"
+			classpathref="classpath">
+			<jvmarg value="-Dmozartspaces.configurationFile=${config.file}"/>
+			<arg line="1 3 ${spaceURI}"/>
+		</java>
+	</target>
+
+	<!-- SHOULD NOT BE USED DIRECTLY -->
+	<target name="run-chocolate" depends="compile">
+		<java classname="sbc.producer.ChocolateRabbitRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="2 3 ${spaceURI}"/>
+		</java>
+	</target>
+
+	<target name="run-colorRabbit" depends="compile">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="1 ${spaceURI} RED"/>
+		</java>
+	</target>
+	
+	<target name="run-colorRabbit2" depends="compile">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="2 ${spaceURI} GREEN"/>
+		</java>
+	</target>
+
+	<target name="run-buildRabbit" depends="compile">
+		<java classname="sbc.worker.BuildRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="3 ${spaceURI}"/>
+		</java>
+	</target>
+
+	<target name="run-buildRabbit2" depends="compile">
+		<java classname="sbc.worker.BuildRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="4 ${spaceURI}"/>
+		</java>
+	</target>
+	
+	<target name="run-logisticRabbit" depends="compile">
+		<java classname="sbc.worker.LogisticRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="5 ${spaceURI}"/>
+		</java>
+	</target>
+	
+	<target name="run-logisticRabbit2" depends="compile">
+		<java classname="sbc.worker.LogisticRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="6 ${spaceURI}"/>
+		</java>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+
+</project>

@@ -1,0 +1,67 @@
+<configuration scan="false" scanPeriod="60 seconds">
+
+	<!-- 
+		The logback configuration manual is online at
+		http://logback.qos.ch/manual/configuration.html.
+		Logback tries to read a configuration file named logback.groovy,
+		logback-test.xml or logback.xml (in that order) from the classpath.
+		Use -Dlogback.configurationFile=/path/to/config.xml to set a different
+		path or filename.
+	-->
+
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<!--
+			encoders are assigned the type
+			ch.qos.logback.classic.encoder.PatternLayoutEncoder by default
+		-->
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+			<!-- 
+				The pattern layout configuration is explained at
+			    http://logback.qos.ch/manual/layouts.html#ClassicPatternLayout
+			 -->
+		</encoder>
+	</appender>
+
+	<!--  
+	<appender name="file" class="ch.qos.logback.core.FileAppender">
+		<append>false</append>
+		<file>MozartSpaces.log</file>
+    	<encoder>
+      		<pattern>%date %-5level [%thread] %logger{10} - %msg%n</pattern>
+    	</encoder>
+  	</appender>
+	-->
+
+	<!-- for further appenders see http://logback.qos.ch/manual/appenders.html -->
+	
+	
+	<root level="INFO">
+		<appender-ref ref="stdout"/>
+		<!-- appender-ref ref="file"/ -->		
+	</root>
+	
+	<!-- 
+		Log levels and their ordering: TRACE < DEBUG < INFO < WARN < ERROR
+		Additional values for "level" in the configuration:
+		* ALL, OFF
+		* INHERITED or NULL (not for root)
+	-->
+	
+	<!-- 
+	<logger name="org.mozartspaces.core" level="TRACE"/>
+	 -->
+	 
+	<!-- 
+		Logging with multiple MozartSpaces instances on the same machine:
+		
+		To have separate logback configuration files for different MozartSpaces
+		instances you can set the configuration file name with a system property:
+		java -Dlogback.configurationFile=/path/to/config.xml MozartSpacesApp
+		
+		To have separated log files for different MozartSpaces instances (with
+		the same logback configuration) you can use variable substitution in the
+		configuration file, e.g., in the FileAppender configuration section. See
+		http://logback.qos.ch/manual/joran.html#variableSubstitution for details.		
+	 -->
+</configuration>

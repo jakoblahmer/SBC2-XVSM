@@ -1,0 +1,103 @@
+<!--
+    MozartSpaces core configuration:
+    - loaded from a file named mozartspaces.xml or the file specified with the system property
+      "mozartspaces.configurationFile"
+    - the system property can be set with "java -Dmozartspaces.configurationFile=<configfile> ..."
+    - the search order for the configuration file is (only relevant if only the file name or a relative path is
+      specified):
+      a) current directory
+      b) user's home directory (user.home)
+      c) classpath
+-->
+<mozartspacesCoreConfig>
+<!-- This default configuration is also contained in the code and used when no configuration file is found -->
+
+	<!-- Determines whether the core has an embedded space or is just a thin client -->
+	<embeddedSpace>false</embeddedSpace>
+	
+    <!-- Core Processor (XP) configuration -->
+    <coreProcessor>
+        <!--
+            The number of threads for the XP thread pool - supported values are:
+            > 0: a fixed thread pool with the specified number of threads is used.
+            Use the values below with caution!
+              0: a synchronous executor service without a thread pool is used.
+            < 0: a cached thread pool (unbounded number of threads) is used.
+        -->
+        <threads>10</threads>
+    </coreProcessor>
+
+    <!-- Serializer configuration, multiple serializers are supported -->
+    <serializers>
+        <!-- 
+		    Serializer name - the supported values are:
+            * javabuiltin: built-in binary serialization
+            Serializers below are not in the core but extra modules:
+            * jaxb: XML marshalling with JAXB, compliant with XVSMP schema
+                    (Cannot be used for copying entries!)
+            * kryo: fast binary serialization, can currently be used for copying entries only
+                    entry classes need to have a no-arg constructur (can be private)
+            Maybe outdated:
+            * xstream-json: XStream serializer with JSON driver (Jettison)
+            * xstream-xml: XStream serializer with default XML driver
+            Custom serializers:
+            * specify the name of the serializer class which needs to have a public no-arg
+              constructor and implement org.mozartspaces.core.util.Serializer
+        -->
+        <serializer>javabuiltin</serializer>
+    </serializers>
+
+    <!-- Remoting configuration -->
+    <remoting>
+        <!-- the default scheme, used to select the sender if no scheme is specified in the destination's space URI -->
+        <defaultScheme>xvsm</defaultScheme>
+        <!-- Configuration of transport handlers with senders and receivers -->
+        <transports>
+            <!-- 
+                TCP Socket transport, with scheme (used to distinguish transports)
+                standard synchronous socket I/O (java.io)
+            -->
+            <tcpsocket scheme="xvsm">
+                <!-- the number of threads for the receiver/sender thread pool (configuration as for XP thread pool) -->
+                <threads>10</threads>
+                <!-- exclusive port to listen for incoming connections -->
+                <receiverPort>0</receiverPort>
+                <!-- the serializer to use, can be a serializer ID or a Apache Commons configuration as below -->
+                <serializer>${serializers.serializer(0)}</serializer>
+            </tcpsocket>            
+            <!-- 
+                other transports could be added, e.g., NIO (Netty), HTTP
+                multiple transports can be used concurrently (identified by the scheme)
+            -->
+        </transports>
+    </remoting>
+
+    <!-- Configuration of the Space URI, identifier and also locator of a space -->
+    <spaceURI>${remoting.defaultScheme}://localhost:${remoting.transports.tcpsocket.receiverPort}</spaceURI>
+    <!-- example above with variables, expanded to "xvsm://localhost:9876" -->
+
+    <!-- Configuration of the entry copier -->
+	<!-- copyContext: should the request context also be copied? -->
+    <entryCopier copyContext="false">
+		
+        <!-- supported elements are one of the following elements: -->
+		
+        <!-- No entry copier, is the default and can be omitted -->
+        <!-- <none /> -->
+        
+        <!-- Serializing entry copier, uses a serializer to copy objects -->
+        <!-- <serializing>${serializers.serializer(0)}</serializing> -->
+        <!-- the element value can be a serializer ID or a variable as below -->
+        
+        <!-- Cloning entry copier, entries need to implement MzsCloneable -->
+        <!-- <cloning /> -->
+    </entryCopier>
+
+    <!-- 
+		CAPI-3 implementation to use, the supported values are:
+	    * javanative: implementation using only JDK classes (collections)
+		* db: database implementation, not included in public distributions
+	-->
+    <capi3>javanative</capi3>
+
+</mozartspacesCoreConfig>
