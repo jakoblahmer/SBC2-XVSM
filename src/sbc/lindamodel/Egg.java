@@ -1,5 +1,7 @@
 package sbc.lindamodel;
 
+import java.util.List;
+
 import org.mozartspaces.capi3.Index;
 import org.mozartspaces.capi3.Queryable;
 
@@ -15,6 +17,9 @@ public class Egg extends sbc.model.Egg {
 	
 	@Index(label="colored")
 	protected boolean linda_colored;
+	
+	@Index(label="colors")
+	protected List<String> linda_color = null;
 	
 	public Egg(boolean colored)	{
 		this.setColored(colored);
@@ -44,5 +49,6 @@ public class Egg extends sbc.model.Egg {
 	public void addColor(String color)	{
 		super.addColor(color);
 		this.linda_colored = super.isColored();
+		this.linda_color.add(color);
 	}
 }

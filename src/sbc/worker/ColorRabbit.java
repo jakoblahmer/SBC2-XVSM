@@ -8,7 +8,11 @@ import org.apache.commons.collections.iterators.ArrayListIterator;
 import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.FifoCoordinator;
 import org.mozartspaces.capi3.LindaCoordinator;
+import org.mozartspaces.capi3.Matchmakers;
+import org.mozartspaces.capi3.Property;
+import org.mozartspaces.capi3.Query;
 import org.mozartspaces.capi3.QueryCoordinator;
+import org.mozartspaces.capi3.QueryCoordinator.QuerySelector;
 import org.mozartspaces.capi3.Selector;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
@@ -104,7 +108,12 @@ public class ColorRabbit extends Worker {
 		while(!close)	{
 			try {
 				tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
-				ArrayList<Serializable> obj = capi.take(productsContainer, LindaCoordinator.newSelector(templateEgg, 1), RequestTimeout.INFINITE, tx);
+				Property colors = Property.forName("*", "colors/*");
+				Query query = new Query().filter( 
+						Matchmakers.not(colors.equalTo(this.color)) 
+				);
+				QuerySelector selector = QueryCoordinator.newSelector(query);
+				ArrayList<Serializable> obj = capi.take(productsContainer, selector, RequestTimeout.INFINITE, tx); // LindaCoordinator.newSelector(templateEgg, 1)
 				for(Serializable s : obj)	{
 					log.info("GOT: " + s);
 					int sleep = new Random().nextInt(3) + 1;
@@ -113,7 +122,13 @@ public class ColorRabbit extends Worker {
 					if(s instanceof Egg)	{
 						
 						egg = (Egg) s;
-						egg.setColor(this.color);
+						
+						// check if query works correctly
+						if (egg.getColors().contains(this.color)) {
+							log.error("ERROR: Got wrong colored egg!");
+							continue;
+						}
+						egg.addColor(this.color);
 						egg.setColorer_id(this.id);
 						
 						capi.write(productsContainer, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
