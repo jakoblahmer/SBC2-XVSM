@@ -111,7 +111,7 @@ public class Chicken extends Producer {
 	}
 	
 	private int getRandomColorCount()	{
-		return new Random().nextInt(2) + 2;
+		return new Random().nextInt(3) + 2;
 	}
 	
 }

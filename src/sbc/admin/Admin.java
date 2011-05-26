@@ -125,93 +125,8 @@ public class Admin implements ProducerInterface {
         	
         	this.createNotifications();
         	
-        	/*
-        	// PRODUCT NOTIFICATION
-        	productsNotification = nm.createNotification(productsRef, new NotificationListener() {
-				
-				@Override
-				public void entryOperationFinished(Notification arg0, Operation arg1,
-						List<? extends Serializable> arg2) {
-					
-					int chocoCount;
-					int eggColoredCount;
-					int eggCount = eggColoredCount = chocoCount = 0;
-					for(Serializable s : arg2)	{
-						if(!(s instanceof Entry))	{
-							log.error("NO ENTRY give... return");
-							return;
-						}
-						Serializable obj = ((Entry) s).getValue();
-						
-						if(obj instanceof Egg)	{
-							if(((Egg)obj).isColored())	{
-								eggColoredCount++;
-								eggCount--;
-							} else	{
-								eggCount++;
-							}
-						} else if(obj instanceof ChocolateRabbit)	{
-							chocoCount++;
-						} else	{
-							log.error("NO EGG / ChocoBunny given - RETURN");
-							return;
-						}
-					}
-					// update in live stats
-					gui.updateInfoData(eggCount, eggColoredCount, chocoCount, 0, 0);
-				}
-			}, Operation.WRITE);
-        	
-        	// NEST NOTIFICATION
-        	nestsNotification = nm.createNotification(nestsRef, new NotificationListener() {
-				
-				@Override
-				public void entryOperationFinished(Notification arg0, Operation arg1,
-						List<? extends Serializable> arg2) {
-					
-					int nestCount;
-					int nestCompletedCount;
-					int chocoCount;
-					int eggColoredCount;
-					int eggCount = eggColoredCount = chocoCount = nestCount = nestCompletedCount = 0;
-					for(Serializable s : arg2)	{
-						if(!(s instanceof Entry))	{
-							log.error("NO ENTRY give... return");
-							return;
-						}
-						Serializable obj = ((Entry) s).getValue();
-						if(obj instanceof Nest)	{
-							Nest nest = (Nest) obj;
-							if(!nest.isComplete())	{
-								log.error("GIVEN NEST IS NOT COMPLETED - ERROR!");
-								return;
-							}
-							
-							if(nest.isShipped())	{
-								// nest is completed
-								nestCompletedCount++;
-								nestCount--;
-							} else	{
-								// nest has to be sipped
-								nestCount++;
-								eggColoredCount-= 2;
-								chocoCount--;
-							}
-							gui.updateNest(nest);
-						} else	{
-							log.error("ERROR: NO NEST GIVEN!");
-							return;
-						}
-					}
-					// update in live stats
-					gui.updateInfoData(eggCount, eggColoredCount, chocoCount, nestCount, nestCompletedCount);
-				}
-			}, Operation.WRITE);
-        	 */
 		} catch (MzsCoreException e) {
 			this.close();
-//		} catch (InterruptedException e) {
-//			this.close();
 		}
 	}
 
@@ -221,14 +136,6 @@ public class Admin implements ProducerInterface {
 	 * TODO check performance of ALL notifications, probably not best solution...
 	 */
 	private void createNotifications() {
-		/*
-		eggsToColorRef = capi.lookupContainer("eggsToColor", space, RequestTimeout.DEFAULT, null);
-    	productsRef = capi.lookupContainer("products", space, RequestTimeout.DEFAULT, null);
-    	nestsRef = capi.lookupContainer("nests", space, RequestTimeout.DEFAULT, null);
-    	nestsCompletedRef = capi.lookupContainer("nestsCompleted", space, RequestTimeout.DEFAULT, null);
-    	nestsErrorRef = capi.lookupContainer("nestsError", space, RequestTimeout.DEFAULT, null);
-    	*/
-		
     	try {
     		
     		// TODO check performance of ALL notifications, probably not best solution...
@@ -258,7 +165,7 @@ public class Admin implements ProducerInterface {
 						Serializable obj = ((Entry) s).getValue();
 						
 						if(obj instanceof Egg)	{
-							gui.updateColoredEgg(1);
+							gui.addColoredEgg(1);
 						} else if(obj instanceof ChocolateRabbit)	{
 							gui.updateChoco(1);
 						} else	{

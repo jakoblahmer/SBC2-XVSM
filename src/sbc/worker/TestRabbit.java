@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.LindaCoordinator;
-import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
@@ -15,7 +13,6 @@ import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsConstants.TransactionTimeout;
 import org.mozartspaces.core.TransactionReference;
 
-import sbc.lindamodel.Egg;
 import sbc.lindamodel.Nest;
 import sbc.worker.exceptions.NoColorGivenException;
 
@@ -116,7 +113,7 @@ public class TestRabbit extends Worker {
 						
 						//if(nest.isErrorFreeAndIsComplete())	{
 							// nest error free and completed => write to nest container
-							capi.write(nestsContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));
+						capi.write(nestsContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));
 						//} else	{
 							// nest has error => write to error container
 						//	capi.write(nestsErrorContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));

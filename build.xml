@@ -129,6 +129,22 @@
 		</java>
 	</target>
 	
+	<target name="run-testRabbit" depends="compile">
+		<java classname="sbc.worker.TestRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="10 ${spaceURI}"/>
+		</java>
+	</target>
+	
+	<target name="run-testRabbit2" depends="compile">
+		<java classname="sbc.worker.TestRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="12 ${spaceURI}"/>
+		</java>
+	</target>
+	
 	<target name="run-logisticRabbit" depends="compile">
 		<java classname="sbc.worker.LogisticRabbit" 
 			fork="true"
