@@ -88,7 +88,7 @@ public class LogisticRabbit extends Worker {
 		
 		log.info("########## AWAITING NESTS (close with Ctrl + C)");
 		
-		Nest templateNest = new Nest(false);
+		Nest templateNest = new Nest(true, false);
 		
 		while(!close)	{
 			try {
@@ -107,7 +107,7 @@ public class LogisticRabbit extends Worker {
 						log.info("WRITE: Nest [id=" + nest.getId() + "]");
 						nest = null;
 					} else	{
-						log.error("GOT OBJECT, which is not an EGG");
+						log.error("GOT OBJECT, which is not a NEST");
 						capi.rollbackTransaction(tx);
 					}
 				}

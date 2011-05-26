@@ -13,23 +13,25 @@ public class Nest extends sbc.model.Nest {
 
 	private static final long serialVersionUID = 2560158684039859496L;
 
+	@Index(label="shipped")
+	private boolean linda_shipped;
 
+	@Index(label="tested")
+	private boolean linda_tested;
+	
 	public Nest()	{
 		super();
 	}
 	
-	public Nest(boolean shipped)	{
+	public Nest(boolean tested, boolean shipped)	{
 		super();
 		this.setShipped(shipped);
+		this.setTested(tested);
 	}
 	
 	public Nest(int producer)	{
 		super(producer);
 	}
-	
-	
-	@Index(label="shipped")
-	private boolean linda_shipped;
 	
 	@Override
 	public boolean isShipped() {
@@ -40,6 +42,17 @@ public class Nest extends sbc.model.Nest {
 	public void setShipped(boolean shipped) {
 		super.setShipped(shipped);
 		this.linda_shipped = shipped;
+	}
+	
+	@Override
+	public boolean isTested() {
+		return linda_tested;
+	}
+	
+	@Override
+	public void setTested(boolean tested) {
+		super.setTested(tested);
+		this.linda_tested = tested;
 	}
 	
 }

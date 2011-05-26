@@ -51,9 +51,14 @@ public class Server {
 	private DefaultMzsCore core;
 	private Capi capi;
 	private URI space;
+	// products container (should be splittet in egg, choco, colored egg container)
 	private ContainerReference productsRef;
+	// nests container (contains nests before tested and shipped)
 	private ContainerReference nestsRef;
+	// error nests container (nests containing a product with an error are stored here)
 	private ContainerReference nestsErrorRef;
+	// completed nests (tested && shipped nests are stored here)
+	private ContainerReference nestsCompletedRef;
 
 	
 	/**
@@ -108,13 +113,25 @@ public class Server {
         			}}, 
         			null, null);
         	
+        	nestsCompletedRef = Util.forceCreateContainer("nestsCompleted", 
+        			space, 
+        			capi, 
+        			Container.UNBOUNDED, 
+        			new ArrayList<Coordinator>() {{ 
+        				add(new LindaCoordinator());	// logistic rabbit selects not shipped nests
+        				add(new AnyCoordinator());		// completed nests
+        			}}, 
+        			null, null);
+        	
+        	
+        	// stores the nests containing a product with an error
         	nestsErrorRef = Util.forceCreateContainer("nestsError", 
         			space, 
         			capi, 
         			Container.UNBOUNDED, 
         			new ArrayList<Coordinator>() {{ 
         				add(new AnyCoordinator());		// select an error nest (nest containing a product with an error)
-        			}}, 
+        			}},
         			null, null);
         	
         	// add aspect
