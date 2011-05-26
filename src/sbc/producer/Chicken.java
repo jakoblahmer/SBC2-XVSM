@@ -3,15 +3,14 @@ package sbc.producer;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.mozartspaces.capi3.LindaCoordinator;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Entry;
+import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsConstants.TransactionTimeout;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.TransactionReference;
 
-import sbc.admin.Admin;
 import sbc.lindamodel.Egg;
-import sbc.spaceServer.Util;
 
 /**
  * creates eggs and places them in the "products" container
@@ -43,7 +42,23 @@ public class Chicken extends Producer {
 		super(args);
 	}
 
-
+	
+	/**
+	 * override, because chicken puts eggs in "eggsToColorContainer", not in "products" container
+	 */
+	@Override
+	protected void init() {
+		super.init();
+        // Ensure that the container "products" exists
+        try {
+        	container = capi.lookupContainer("eggsToColor", space, RequestTimeout.DEFAULT, null);
+		} catch (MzsCoreException e) {
+			System.out.println("ERROR ESTABLISHING CONNECTION TO CONTAINER");
+			e.printStackTrace();
+			this.close();
+		}
+	}
+	
 	/**
 	 * produces the eggs and places them in the "products" container
 	 */
@@ -65,7 +80,7 @@ public class Chicken extends Producer {
 				egg = new Egg(this.id, getRandomColorCount());
 				egg.setError(this.calculateDefect());
 				
-				capi.write(container, 0, tx, new Entry(egg, LindaCoordinator.newCoordinationData()));
+				capi.write(container, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
 				
 				log.info("###### EGG (" + (egg.getId()) + ") ("+(i+1) + "/" + productCount + ") done");
 				log.info("#######################################");

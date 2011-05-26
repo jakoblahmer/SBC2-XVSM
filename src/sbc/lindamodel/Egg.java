@@ -12,6 +12,7 @@ import org.mozartspaces.capi3.Queryable;
  *
  */
 @Queryable
+@Index(label="Egg.class")
 public class Egg extends sbc.model.Egg {
 
 	private static final long serialVersionUID = 6253223622921211723L;

@@ -9,13 +9,11 @@ import org.mozartspaces.capi3.Queryable;
  *
  */
 @Queryable
+@Index(label="ChocolateRabbit.class")
 public class ChocolateRabbit extends sbc.model.ChocolateRabbit {
 
 	private static final long serialVersionUID = 1L;
 
-	
-	@Index(label="isChocoRabbit")
-	private boolean isChocoRabbit = true;
 	
 	public ChocolateRabbit()	{
 		super();
@@ -23,13 +21,5 @@ public class ChocolateRabbit extends sbc.model.ChocolateRabbit {
 	
 	public ChocolateRabbit(int producer)	{
 		super(producer);
-	}
-
-	public void setChocoRabbit(boolean isChocoRabbit) {
-		this.isChocoRabbit = true;
-	}
-
-	public boolean isChocoRabbit() {
-		return isChocoRabbit;
 	}
 }

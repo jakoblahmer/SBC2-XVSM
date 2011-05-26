@@ -104,18 +104,18 @@ public class BuildRabbit extends Worker {
 	 */
 	private void initQueries() {
 		// get eggs
-		Property eggColoredProperty = Property.forName("*", "colored");
+		Property eggColoredProperty = Property.forName("Egg.class", "colored");
 		// get choco rabbits
-		Property chocoProperty = Property.forName("*", "isChocoRabbit");
+		Property chocoProperty = Property.forName("ChocolateRabbit.class");
 		
 		
-		querySelectorAll = new Query().filter(Matchmakers.or(eggColoredProperty.equalTo(true), chocoProperty.equalTo(true)));
+		querySelectorAll = new Query().filter(Matchmakers.or(eggColoredProperty.equalTo(true), chocoProperty.exists()));
 		querySelectorAll.cnt(1);
 		
 		querySelectorEgg = new Query().filter(eggColoredProperty.equalTo(true));
 		querySelectorEgg.cnt(1);
 		
-		querySelectorChoco = new Query().filter(chocoProperty.equalTo(true));
+		querySelectorChoco = new Query().filter(chocoProperty.exists());
 		querySelectorChoco.cnt(1);
 	}
 	

@@ -59,6 +59,7 @@ public class Server {
 	private ContainerReference nestsErrorRef;
 	// completed nests (tested && shipped nests are stored here)
 	private ContainerReference nestsCompletedRef;
+	private ContainerReference egssToColorRef;
 
 	
 	/**
@@ -91,13 +92,20 @@ public class Server {
 		// create products container
         try {
         	
-        	log.info("CREATE CONTAINER (products)");
+        	egssToColorRef = Util.forceCreateContainer("eggsToColor", 
+        			space, 
+        			capi, 
+        			Container.UNBOUNDED, 
+        			new ArrayList<Coordinator>() {{ 
+						add(new QueryCoordinator());	// eggs to color selected via linda
+					}}, 
+					null, null);
+        	
         	productsRef = Util.forceCreateContainer("products", 
         			space, 
         			capi, 
         			Container.UNBOUNDED, 
         			new ArrayList<Coordinator>() {{ 
-						add(new LindaCoordinator());	// eggs to color
 						add(new QueryCoordinator());	// build bunny (select missing products)
 						add(new AnyCoordinator());		// bunnies (can be selected randomly)
 					}}, 
@@ -135,8 +143,10 @@ public class Server {
         			null, null);
         	
         	// add aspect
-        	capi.addContainerAspect(new IdAspect(), productsRef, new HashSet<ContainerIPoint>(){{ add(ContainerIPoint.PRE_WRITE); }}, null);
-        	capi.addContainerAspect(new IdAspect(), nestsRef, new HashSet<ContainerIPoint>(){{ add(ContainerIPoint.PRE_WRITE); }}, null);
+        	IdAspect aspect = new IdAspect();
+        	capi.addContainerAspect(aspect, egssToColorRef, new HashSet<ContainerIPoint>(){{ add(ContainerIPoint.PRE_WRITE); }}, null);
+        	capi.addContainerAspect(aspect, productsRef, new HashSet<ContainerIPoint>(){{ add(ContainerIPoint.PRE_WRITE); }}, null);
+        	capi.addContainerAspect(aspect, nestsRef, new HashSet<ContainerIPoint>(){{ add(ContainerIPoint.PRE_WRITE); }}, null);
         	
 		} catch (MzsCoreException e) {
 			this.close();

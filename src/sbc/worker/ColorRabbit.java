@@ -42,10 +42,12 @@ public class ColorRabbit extends Worker {
 	private static Logger log = Logger.getLogger(ColorRabbit.class);
 
 	private String color;
+	private ContainerReference eggsToColorContainer;
 	private ContainerReference productsContainer;
 	private boolean close;
 	private TransactionReference tx;
 	private Egg egg;
+
 	
 	/**
 	 * expected params: id, space URI, color
@@ -87,6 +89,7 @@ public class ColorRabbit extends Worker {
 		super.initContainer();
 		
 		try {
+			eggsToColorContainer = capi.lookupContainer("eggsToColor", space, RequestTimeout.DEFAULT, null);
 			productsContainer = capi.lookupContainer("products", space, RequestTimeout.DEFAULT, null);
 		} catch (MzsCoreException e) {
 			System.out.println("ERROR ESTABLISHING CONNECTION TO CONTAINER");
@@ -105,7 +108,7 @@ public class ColorRabbit extends Worker {
 		log.info("########## (close with Ctrl + C)");
 		
 		/** CREATE QUERY SELECTOR **/
-		Property colors = Property.forName("*", "colors", "*");
+		Property colors = Property.forName("Egg.class", "colors", "*");
 		Query query = new Query().filter( 
 				Matchmakers.not(colors.equalTo(this.color)) 
 		);
@@ -115,7 +118,7 @@ public class ColorRabbit extends Worker {
 			try {
 				log.info("########## AWAITING EGGS");
 				tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
-				ArrayList<Serializable> obj = capi.take(productsContainer, selector, RequestTimeout.INFINITE, tx); // LindaCoordinator.newSelector(templateEgg, 1)
+				ArrayList<Serializable> obj = capi.take(eggsToColorContainer, selector, RequestTimeout.INFINITE, tx);
 				for(Serializable s : obj)	{
 					log.info("GOT: " + s);
 					int sleep = new Random().nextInt(3) + 1;
@@ -132,7 +135,14 @@ public class ColorRabbit extends Worker {
 						}
 						egg.addColor(this.color, this.id);
 						
-						capi.write(productsContainer, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
+						// egg is completely colored => write to products container
+						if(egg.isColored())	{
+							capi.write(productsContainer, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
+						} else	{
+							// write egg to eggsToColor container
+							capi.write(eggsToColorContainer, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
+						}
+						
 						log.info("WRITE: " + s);
 						egg = null;
 					} else	{
