@@ -2,6 +2,7 @@ package sbc.admin;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -69,6 +70,18 @@ public class Admin implements ProducerInterface {
 	private Notification productsNotification;
 	private Notification nestsNotification;
 
+	private ContainerReference eggsToColorRef;
+
+	private ContainerReference nestsCompletedRef;
+
+	private ContainerReference nestsErrorRef;
+
+	private Notification eggsToColorNotification;
+
+	private Notification nestsCompletedNotification;
+
+	private Notification nestsErrorNotification;
+
 	
 	/**
 	 * start Admin
@@ -102,12 +115,17 @@ public class Admin implements ProducerInterface {
 	 * creates the XVSM Containers
 	 */
 	private void initXVSMContainers() {
-		// create products container
         try {
         	
+        	eggsToColorRef = capi.lookupContainer("eggsToColor", space, RequestTimeout.DEFAULT, null);
         	productsRef = capi.lookupContainer("products", space, RequestTimeout.DEFAULT, null);
-			nestsRef = capi.lookupContainer("nests", space, RequestTimeout.DEFAULT, null);
+        	nestsRef = capi.lookupContainer("nests", space, RequestTimeout.DEFAULT, null);
+        	nestsCompletedRef = capi.lookupContainer("nestsCompleted", space, RequestTimeout.DEFAULT, null);
+        	nestsErrorRef = capi.lookupContainer("nestsError", space, RequestTimeout.DEFAULT, null);
         	
+        	this.createNotifications();
+        	
+        	/*
         	// PRODUCT NOTIFICATION
         	productsNotification = nm.createNotification(productsRef, new NotificationListener() {
 				
@@ -189,11 +207,154 @@ public class Admin implements ProducerInterface {
 					gui.updateInfoData(eggCount, eggColoredCount, chocoCount, nestCount, nestCompletedCount);
 				}
 			}, Operation.WRITE);
+        	 */
 		} catch (MzsCoreException e) {
 			this.close();
-		} catch (InterruptedException e) {
-			this.close();
+//		} catch (InterruptedException e) {
+//			this.close();
 		}
+	}
+
+	/**
+	 * creates the notifications for the live statistics
+	 * 
+	 * TODO check performance of ALL notifications, probably not best solution...
+	 */
+	private void createNotifications() {
+		/*
+		eggsToColorRef = capi.lookupContainer("eggsToColor", space, RequestTimeout.DEFAULT, null);
+    	productsRef = capi.lookupContainer("products", space, RequestTimeout.DEFAULT, null);
+    	nestsRef = capi.lookupContainer("nests", space, RequestTimeout.DEFAULT, null);
+    	nestsCompletedRef = capi.lookupContainer("nestsCompleted", space, RequestTimeout.DEFAULT, null);
+    	nestsErrorRef = capi.lookupContainer("nestsError", space, RequestTimeout.DEFAULT, null);
+    	*/
+		
+    	try {
+    		
+    		// TODO check performance of ALL notifications, probably not best solution...
+    		
+    		eggsToColorNotification = nm.createNotification(eggsToColorRef, new NotificationListener() {
+				@Override
+				public void entryOperationFinished(Notification arg0, Operation arg1, List<? extends Serializable> arg2) {
+					for(Serializable s : arg2)	{
+						if(((Entry)s).getValue() instanceof Egg)	{
+							if(arg1 == Operation.WRITE)
+								gui.updateEgg(1);
+							else if(arg1 == Operation.TAKE)
+								gui.updateEgg(-1);
+						}
+					}
+				}
+			}, Operation.WRITE, Operation.TAKE);
+    		
+    		
+        	productsNotification = nm.createNotification(productsRef, new NotificationListener() {
+				
+				@Override
+				public void entryOperationFinished(Notification arg0, Operation arg1,
+						List<? extends Serializable> arg2) {
+					
+					for(Serializable s : arg2)	{
+						Serializable obj = ((Entry) s).getValue();
+						
+						if(obj instanceof Egg)	{
+							gui.updateColoredEgg(1);
+						} else if(obj instanceof ChocolateRabbit)	{
+							gui.updateChoco(1);
+						} else	{
+							log.error("NO EGG / ChocoBunny given - RETURN");
+							return;
+						}
+					}
+				}
+			}, Operation.WRITE);
+    		
+        	nestsNotification = nm.createNotification(nestsRef, new NotificationListener() {
+				
+				@Override
+				public void entryOperationFinished(Notification arg0, Operation arg1,
+						List<? extends Serializable> arg2) {
+					
+					for(Serializable s : arg2)	{
+						Serializable obj = ((Entry) s).getValue();
+						if(obj instanceof Nest)	{
+							Nest nest = (Nest) obj;
+							if(!nest.isComplete())	{
+								log.error("GIVEN NEST IS NOT COMPLETED - ERROR!");
+								return;
+							}
+							
+							if(!nest.isTested() && !nest.isShipped())	{
+								// first time written here
+								gui.addNest(nest);
+							} else	{
+								gui.updateNest(nest);
+							}
+						} else	{
+							log.error("ERROR: NO NEST GIVEN!");
+							return;
+						}
+					}
+				}
+			}, Operation.WRITE);
+        	
+        	nestsCompletedNotification = nm.createNotification(nestsCompletedRef, new NotificationListener() {
+				
+				@Override
+				public void entryOperationFinished(Notification arg0, Operation arg1,
+						List<? extends Serializable> arg2) {
+					
+					for(Serializable s : arg2)	{
+						Serializable obj = ((Entry) s).getValue();
+						if(obj instanceof Nest)	{
+							Nest nest = (Nest) obj;
+							if(!nest.isComplete())	{
+								log.error("GIVEN NEST IS NOT COMPLETED - ERROR!");
+								return;
+							}
+							
+							// final destination for nest
+							gui.addCompletedNest(nest);
+						} else	{
+							log.error("ERROR: NO NEST GIVEN!");
+							return;
+						}
+					}
+				}
+			}, Operation.WRITE);
+        	
+        	nestsErrorNotification = nm.createNotification(nestsErrorRef, new NotificationListener() {
+				
+				@Override
+				public void entryOperationFinished(Notification arg0, Operation arg1,
+						List<? extends Serializable> arg2) {
+					
+					for(Serializable s : arg2)	{
+						Serializable obj = ((Entry) s).getValue();
+						if(obj instanceof Nest)	{
+							Nest nest = (Nest) obj;
+							if(!nest.isComplete())	{
+								log.error("GIVEN NEST IS NOT COMPLETED - ERROR!");
+								return;
+							}
+							gui.addErrorNest(nest);
+						} else	{
+							log.error("ERROR: NO NEST GIVEN!");
+							return;
+						}
+					}
+				}
+			}, Operation.WRITE);
+        	
+		} catch (MzsCoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
 	}
 
 	/**
