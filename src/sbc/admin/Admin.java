@@ -3,6 +3,7 @@ package sbc.admin;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -37,6 +38,7 @@ public class Admin implements ProducerInterface {
 	private static AtomicInteger chickenID = new AtomicInteger(0);
 	private static AtomicInteger chocoRabbitID = new AtomicInteger(0);
 	
+	private final static Double MAX_FAILURE_RATE = 0.5; 
 	
 	/**
 	 * params: XVSM URI
@@ -207,12 +209,12 @@ public class Admin implements ProducerInterface {
 		ChocolateRabbitRabbit rabbit;
 		
 		for(int i=0;i<chicken; i++)	{
-			chick = new Chicken(new String[]{"" + chickenID.incrementAndGet(), "" + eggs, space.toString()});
+			chick = new Chicken(new String[]{"" + chickenID.incrementAndGet(), "" + eggs, String.valueOf(new Random().nextDouble() * MAX_FAILURE_RATE), space.toString()});
 			chick.start();
 		}
 		
 		for(int i=0;i<choco; i++)	{
-			rabbit = new ChocolateRabbitRabbit(new String[]{"" + chocoRabbitID.incrementAndGet(), "" + chocoRabbits, space.toString()});
+			rabbit = new ChocolateRabbitRabbit(new String[]{"" + chocoRabbitID.incrementAndGet(), "" + chocoRabbits, String.valueOf(new Random().nextDouble() * MAX_FAILURE_RATE), space.toString()});
 			rabbit.start();
 		}
 		

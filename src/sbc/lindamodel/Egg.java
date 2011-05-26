@@ -1,5 +1,6 @@
 package sbc.lindamodel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.mozartspaces.capi3.Index;
@@ -25,14 +26,10 @@ public class Egg extends sbc.model.Egg {
 		this.setColored(colored);
 	}
 	
-	public Egg(int producer) {
-		super(producer);
-	}
-	
 	public Egg(int producer, int colorCount) {
 		super(producer, colorCount);
+		this.linda_color = new ArrayList<String>(colorCount);
 	}
-
 
 	@Override
 	public boolean isColored()	{
@@ -46,9 +43,9 @@ public class Egg extends sbc.model.Egg {
 	}
 	
 	@Override
-	public void addColor(String color)	{
-		super.addColor(color);
-		this.linda_colored = super.isColored();
+	public void addColor(String color, int colorer_id)	{
+		super.addColor(color, colorer_id);
 		this.linda_color.add(color);
+		this.linda_colored = super.isColored();
 	}
 }

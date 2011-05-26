@@ -62,6 +62,7 @@ public class ColorRabbit extends Worker {
 		
 		this.addShutdownHookback();
 		
+		log.info("################# COLORRABBIT (" + this.color + ")");
 		this.readEggs();
 	}
 
@@ -101,18 +102,19 @@ public class ColorRabbit extends Worker {
 	 */
 	private void readEggs() {
 		
-		log.info("########## AWAITING EGGS (close with Ctrl + C)");
+		log.info("########## (close with Ctrl + C)");
 		
-		Egg templateEgg = new Egg(false);
+		/** CREATE QUERY SELECTOR **/
+		Property colors = Property.forName("*", "colors", "*");
+		Query query = new Query().filter( 
+				Matchmakers.not(colors.equalTo(this.color)) 
+		);
+		QuerySelector selector = QueryCoordinator.newSelector(query,1);
 		
 		while(!close)	{
 			try {
+				log.info("########## AWAITING EGGS");
 				tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
-				Property colors = Property.forName("*", "colors/*");
-				Query query = new Query().filter( 
-						Matchmakers.not(colors.equalTo(this.color)) 
-				);
-				QuerySelector selector = QueryCoordinator.newSelector(query);
 				ArrayList<Serializable> obj = capi.take(productsContainer, selector, RequestTimeout.INFINITE, tx); // LindaCoordinator.newSelector(templateEgg, 1)
 				for(Serializable s : obj)	{
 					log.info("GOT: " + s);
@@ -124,12 +126,11 @@ public class ColorRabbit extends Worker {
 						egg = (Egg) s;
 						
 						// check if query works correctly
-						if (egg.getColors().contains(this.color)) {
+						if (egg.getColor().contains(this.color)) {
 							log.error("ERROR: Got wrong colored egg!");
 							continue;
 						}
-						egg.addColor(this.color);
-						egg.setColorer_id(this.id);
+						egg.addColor(this.color, this.id);
 						
 						capi.write(productsContainer, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
 						log.info("WRITE: " + s);
