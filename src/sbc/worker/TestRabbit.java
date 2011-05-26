@@ -33,7 +33,7 @@ public class TestRabbit extends Worker {
 	private static Logger log = Logger.getLogger(TestRabbit.class);
 
 	private ContainerReference nestsContainer;
-	private ContainerReference nestsErrorContainer;
+//	private ContainerReference nestsErrorContainer;
 	private boolean close;
 	private TransactionReference tx;
 	private Nest nest;
@@ -74,7 +74,7 @@ public class TestRabbit extends Worker {
 		
 		try {
 			nestsContainer = capi.lookupContainer("nests", space, RequestTimeout.DEFAULT, null);
-			nestsErrorContainer = capi.lookupContainer("nestsError", space, RequestTimeout.DEFAULT, null);
+//			nestsErrorContainer = capi.lookupContainer("nestsError", space, RequestTimeout.DEFAULT, null);
 		} catch (MzsCoreException e) {
 			System.out.println("ERROR ESTABLISHING CONNECTION TO CONTAINER");
 			e.printStackTrace();
@@ -104,16 +104,23 @@ public class TestRabbit extends Worker {
 						int sleep = new Random().nextInt(3) + 1;
 						Thread.sleep(sleep * 1000);
 						
+						// calculate error and set it
+						nest.calculateError();
+						// set tested to true
 						nest.setTested(true);
 						nest.setTester_id(this.id);
 						
-						if(nest.isErrorFreeAndIsComplete())	{
+						// check if nest has no error and is complete
+						// NOT NEEDED HERE => moved to logistic rabbit
+						// assignment says: "moving to error container" has to be done in logistic rabbit
+						
+						//if(nest.isErrorFreeAndIsComplete())	{
 							// nest error free and completed => write to nest container
 							capi.write(nestsContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));
-						} else	{
+						//} else	{
 							// nest has error => write to error container
-							capi.write(nestsErrorContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));
-						}
+						//	capi.write(nestsErrorContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));
+						//}
 						log.info("WRITE: Nest [id=" + nest.getId() + "]");
 						nest = null;
 					} else	{

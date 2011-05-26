@@ -33,9 +33,12 @@ public class LogisticRabbit extends Worker {
 	private static Logger log = Logger.getLogger(LogisticRabbit.class);
 
 	private ContainerReference nestsContainer;
+	private ContainerReference nestsCompletedContainer;
+	private ContainerReference nestsErrorContainer;
 	private boolean close;
 	private TransactionReference tx;
 	private Nest nest;
+
 
 
 	/**
@@ -72,6 +75,8 @@ public class LogisticRabbit extends Worker {
 		
 		try {
 			nestsContainer = capi.lookupContainer("nests", space, RequestTimeout.DEFAULT, null);
+			nestsCompletedContainer = capi.lookupContainer("nestsCompleted", space, RequestTimeout.DEFAULT, null);
+			nestsErrorContainer = capi.lookupContainer("nestsError", space, RequestTimeout.DEFAULT, null);
 		} catch (MzsCoreException e) {
 			System.out.println("ERROR ESTABLISHING CONNECTION TO CONTAINER");
 			e.printStackTrace();
@@ -88,6 +93,7 @@ public class LogisticRabbit extends Worker {
 		
 		log.info("########## AWAITING NESTS (close with Ctrl + C)");
 		
+		// check tested, but not shipped nest
 		Nest templateNest = new Nest(true, false);
 		
 		while(!close)	{
@@ -103,7 +109,15 @@ public class LogisticRabbit extends Worker {
 						
 						nest.setShipped(true);
 						nest.setShipper_id(this.id);
-						capi.write(nestsContainer, 0, tx, new Entry(nest, AnyCoordinator.newCoordinationData()));
+						
+						// method name says everything
+						if(nest.isErrorFreeAndIsComplete())	{
+							// nest error free and completed => write to competed nest container
+							capi.write(nestsCompletedContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));
+						} else	{
+							// nest has error (or is not completed) => write to error container
+							capi.write(nestsErrorContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));
+						}
 						log.info("WRITE: Nest [id=" + nest.getId() + "]");
 						nest = null;
 					} else	{

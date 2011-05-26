@@ -71,6 +71,14 @@
 		</java>
 	</target>
 
+	
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<!-- !!! following ANT TAGS have to be created for more than 1 space! -->
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 	<target name="run-colorRabbit" depends="compile">
 		<java classname="sbc.worker.ColorRabbit" 
 			fork="true"
@@ -87,6 +95,24 @@
 		</java>
 	</target>
 
+	<target name="run-colorRabbit3" depends="compile">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="2 ${spaceURI} BLUE"/>
+		</java>
+	</target>
+	
+	<target name="run-colorRabbit4" depends="compile">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="2 ${spaceURI} YELLOW"/>
+		</java>
+	</target>
+	
+	
+	
 	<target name="run-buildRabbit" depends="compile">
 		<java classname="sbc.worker.BuildRabbit" 
 			fork="true"
