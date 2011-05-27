@@ -7,6 +7,9 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.LindaCoordinator;
+import org.mozartspaces.capi3.Matchmakers;
+import org.mozartspaces.capi3.Property;
+import org.mozartspaces.capi3.Query;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.Entry;
@@ -94,12 +97,18 @@ public class LogisticRabbit extends Worker {
 		log.info("########## AWAITING NESTS (close with Ctrl + C)");
 		
 		// check tested, but not shipped nest
-		Nest templateNest = new Nest(true, false);
+		/** CREATE QUERY SELECTOR **/
+		Property testedProp = Property.forName("Nest.class", "tested");
+		Property shippedProp = Property.forName("Nest.class", "shipped");
+		Query query = new Query().filter(
+				Matchmakers.and(testedProp.equalTo(true), shippedProp.equalTo(false)) 
+		);
+		query.cnt(1);
 		
 		while(!close)	{
 			try {
 				tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
-				ArrayList<Serializable> obj = capi.take(nestsContainer, LindaCoordinator.newSelector(templateNest, 1), RequestTimeout.INFINITE, tx);
+				ArrayList<Serializable> obj = capi.take(nestsContainer, QueryCoordinator.newSelector(query, 1), RequestTimeout.INFINITE, tx);
 				for(Serializable s : obj)	{
 					if(s instanceof Nest)	{
 						nest = (Nest) s;
@@ -113,10 +122,10 @@ public class LogisticRabbit extends Worker {
 						// method name says everything
 						if(nest.isErrorFreeAndIsComplete())	{
 							// nest error free and completed => write to competed nest container
-							capi.write(nestsCompletedContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));
+							capi.write(nestsCompletedContainer, 0, tx, new Entry(nest, AnyCoordinator.newCoordinationData()));
 						} else	{
 							// nest has error (or is not completed) => write to error container
-							capi.write(nestsErrorContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));
+							capi.write(nestsErrorContainer, 0, tx, new Entry(nest, AnyCoordinator.newCoordinationData()));
 						}
 						log.info("WRITE: Nest [id=" + nest.getId() + "]");
 						nest = null;

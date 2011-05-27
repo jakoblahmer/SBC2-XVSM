@@ -200,7 +200,7 @@ public class BuildRabbit extends Worker {
 					// send nest
 					log.info("###### NEST is complete, send it");
 					log.info("#######################################");
-					capi.write(nestsContainer, 0, tx, new Entry(currentNest, LindaCoordinator.newCoordinationData()));
+					capi.write(nestsContainer, 0, tx, new Entry(currentNest, QueryCoordinator.newCoordinationData()));
 					capi.commitTransaction(tx);
 					currentNest = null;
 					log.info("###### waiting for ingrediants...");

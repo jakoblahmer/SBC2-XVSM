@@ -112,6 +112,7 @@ public class ColorRabbit extends Worker {
 		Query query = new Query().filter( 
 				Matchmakers.not(colors.equalTo(this.color)) 
 		);
+		query.cnt(1);
 		QuerySelector selector = QueryCoordinator.newSelector(query,1);
 		
 		while(!close)	{

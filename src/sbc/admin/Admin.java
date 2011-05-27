@@ -66,20 +66,16 @@ public class Admin implements ProducerInterface {
 	private URI space;
 	private ContainerReference productsRef;
 	private ContainerReference nestsRef;
-	private NotificationManager nm;
-	private Notification productsNotification;
-	private Notification nestsNotification;
-
 	private ContainerReference eggsToColorRef;
-
 	private ContainerReference nestsCompletedRef;
-
 	private ContainerReference nestsErrorRef;
 
+	private NotificationManager nm;
+	
+	private Notification productsNotification;
+	private Notification nestsNotification;
 	private Notification eggsToColorNotification;
-
 	private Notification nestsCompletedNotification;
-
 	private Notification nestsErrorNotification;
 
 	
@@ -144,7 +140,10 @@ public class Admin implements ProducerInterface {
 				@Override
 				public void entryOperationFinished(Notification arg0, Operation arg1, List<? extends Serializable> arg2) {
 					for(Serializable s : arg2)	{
-						if(((Entry)s).getValue() instanceof Egg)	{
+						if(!(s instanceof Egg))	{
+							s = ((Entry) s).getValue();
+						}
+						if(s instanceof Egg)	{
 							if(arg1 == Operation.WRITE)
 								gui.updateEgg(1);
 							else if(arg1 == Operation.TAKE)
@@ -176,6 +175,7 @@ public class Admin implements ProducerInterface {
 				}
 			}, Operation.WRITE);
     		
+        	
         	nestsNotification = nm.createNotification(nestsRef, new NotificationListener() {
 				
 				@Override
@@ -190,7 +190,6 @@ public class Admin implements ProducerInterface {
 								log.error("GIVEN NEST IS NOT COMPLETED - ERROR!");
 								return;
 							}
-							
 							if(!nest.isTested() && !nest.isShipped())	{
 								// first time written here
 								gui.addNest(nest);

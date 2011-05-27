@@ -116,8 +116,8 @@ public class Server {
         			capi, 
         			Container.UNBOUNDED, 
         			new ArrayList<Coordinator>() {{ 
-        				add(new LindaCoordinator());	// logistic rabbit selects not shipped nests
-        				add(new AnyCoordinator());		// completed nests
+        				add(new QueryCoordinator());	// test rabbit selects not tested nests
+//        				add(new AnyCoordinator());		// completed nests
         			}}, 
         			null, null);
         	
@@ -126,7 +126,6 @@ public class Server {
         			capi, 
         			Container.UNBOUNDED, 
         			new ArrayList<Coordinator>() {{ 
-        				add(new LindaCoordinator());	// logistic rabbit selects not shipped nests
         				add(new AnyCoordinator());		// completed nests
         			}}, 
         			null, null);

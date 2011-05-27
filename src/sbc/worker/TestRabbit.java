@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.mozartspaces.capi3.LindaCoordinator;
+import org.mozartspaces.capi3.Matchmakers;
+import org.mozartspaces.capi3.Property;
+import org.mozartspaces.capi3.Query;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
@@ -88,16 +91,22 @@ public class TestRabbit extends Worker {
 		
 		log.info("########## AWAITING NESTS (close with Ctrl + C)");
 		
-		Nest templateNest = new Nest(false, false);
+		/** CREATE QUERY SELECTOR **/
+		Property testedProp = Property.forName("Nest.class", "tested");
+		Property shippedProp = Property.forName("Nest.class", "shipped");
+		Query query = new Query().filter(
+				Matchmakers.and(testedProp.equalTo(false), shippedProp.equalTo(false)) 
+		);
+		query.cnt(1);
 		
 		while(!close)	{
 			try {
 				tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
-				ArrayList<Serializable> obj = capi.take(nestsContainer, LindaCoordinator.newSelector(templateNest, 1), RequestTimeout.INFINITE, tx);
+				ArrayList<Serializable> obj = capi.take(nestsContainer, QueryCoordinator.newSelector(query,1), RequestTimeout.INFINITE, tx);
 				for(Serializable s : obj)	{
 					if(s instanceof Nest)	{
 						nest = (Nest) s;
-						log.info("GOT: Nest [id=" + nest.getId() + "]");
+						log.info("GOT: Nest [id=" + nest.getId() + "] " + nest.isTested());
 						int sleep = new Random().nextInt(3) + 1;
 						Thread.sleep(sleep * 1000);
 						
@@ -107,17 +116,8 @@ public class TestRabbit extends Worker {
 						nest.setTested(true);
 						nest.setTester_id(this.id);
 						
-						// check if nest has no error and is complete
-						// NOT NEEDED HERE => moved to logistic rabbit
-						// assignment says: "moving to error container" has to be done in logistic rabbit
+						capi.write(nestsContainer, 0, tx, new Entry(nest, QueryCoordinator.newCoordinationData()));
 						
-						//if(nest.isErrorFreeAndIsComplete())	{
-							// nest error free and completed => write to nest container
-						capi.write(nestsContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));
-						//} else	{
-							// nest has error => write to error container
-						//	capi.write(nestsErrorContainer, 0, tx, new Entry(nest, LindaCoordinator.newCoordinationData()));
-						//}
 						log.info("WRITE: Nest [id=" + nest.getId() + "]");
 						nest = null;
 					} else	{

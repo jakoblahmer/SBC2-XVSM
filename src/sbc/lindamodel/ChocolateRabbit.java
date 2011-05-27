@@ -14,7 +14,6 @@ public class ChocolateRabbit extends sbc.model.ChocolateRabbit {
 
 	private static final long serialVersionUID = 1L;
 
-	
 	public ChocolateRabbit()	{
 		super();
 	}

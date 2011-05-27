@@ -99,7 +99,7 @@
 		<java classname="sbc.worker.ColorRabbit" 
 			fork="true"
 			classpathref="classpath">
-			<arg line="2 ${spaceURI} BLUE"/>
+			<arg line="42 ${spaceURI} BLUE"/>
 		</java>
 	</target>
 	
@@ -107,7 +107,7 @@
 		<java classname="sbc.worker.ColorRabbit" 
 			fork="true"
 			classpathref="classpath">
-			<arg line="2 ${spaceURI} YELLOW"/>
+			<arg line="24 ${spaceURI} YELLOW"/>
 		</java>
 	</target>
 	
