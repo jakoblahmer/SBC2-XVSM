@@ -17,9 +17,9 @@ import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsConstants.TransactionTimeout;
 import org.mozartspaces.core.TransactionReference;
 
-import sbc.lindamodel.ChocolateRabbit;
-import sbc.lindamodel.Egg;
-import sbc.lindamodel.Nest;
+import sbc.model.lindamodel.ChocolateRabbit;
+import sbc.model.lindamodel.Egg;
+import sbc.model.lindamodel.Nest;
 import sbc.worker.exceptions.BuildNestException;
 
 /**
@@ -41,7 +41,6 @@ public class BuildRabbit extends Worker {
 	private Query querySelectorChoco;
 	
 	private ContainerReference nestsContainer;
-	private TransactionReference tx;
 	
 	private Nest currentNest;
 	private int chocoCount;
@@ -94,8 +93,10 @@ public class BuildRabbit extends Worker {
 			e.printStackTrace();
 			System.exit(0);
 		}
+		
+		this.increaseWorkerCount("buildRabbit");
 	}
-	
+
 	/**
 	 * creates the queries for the different selection "modes"
 	 * 	- ALL: select chocoRabbit OR egg

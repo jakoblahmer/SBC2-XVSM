@@ -1,13 +1,24 @@
 package sbc.worker;
 
+import java.io.Serializable;
 import java.net.URI;
+import java.util.ArrayList;
 
+import org.mozartspaces.capi3.AnyCoordinator;
+import org.mozartspaces.capi3.Property;
+import org.mozartspaces.capi3.Query;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
+import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCore;
 import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.core.TransactionReference;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
+import org.mozartspaces.core.MzsConstants.TransactionTimeout;
+
+import sbc.model.lindamodel.WorkerCount;
 
 /**
  * abstract class for worker
@@ -27,6 +38,7 @@ public abstract class Worker {
 
 	protected ContainerReference productsContainer;
 
+	protected TransactionReference tx;
 
 	protected DefaultMzsCore core;
 	
@@ -85,5 +97,38 @@ public abstract class Worker {
         }
 	}
 
+	
+	
+	/**
+	 * retrieves the current amount of worker rabbits and increases the amount
+	 */
+	protected void increaseWorkerCount(String workerName) {
+		try {
+			ContainerReference loadbalancingRef = capi.lookupContainer("systemInfo", space, RequestTimeout.DEFAULT, null);
+			Property countProperty = Property.forName("WorkerCount.class", "name");
+			
+			Query query = new Query().filter(countProperty.equalTo(workerName));
+			query.cnt(1);
+			
+			tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
+			
+			ArrayList<Serializable> entryarray = capi.take(loadbalancingRef, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+			
+			Serializable elem = entryarray.get(0);
+			if(elem instanceof WorkerCount)	{
+				WorkerCount model = (WorkerCount) elem;
+				model.increaseCount();
+				capi.write(loadbalancingRef, 0, tx, new Entry(model, QueryCoordinator.newCoordinationData()));
+				capi.commitTransaction(tx);
+			} else	{
+				capi.rollbackTransaction(tx);
+			}
+			
+		} catch (MzsCoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	protected abstract void close();
 }

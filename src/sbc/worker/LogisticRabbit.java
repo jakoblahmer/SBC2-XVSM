@@ -18,8 +18,8 @@ import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsConstants.TransactionTimeout;
 import org.mozartspaces.core.TransactionReference;
 
-import sbc.lindamodel.Egg;
-import sbc.lindamodel.Nest;
+import sbc.model.lindamodel.Egg;
+import sbc.model.lindamodel.Nest;
 import sbc.worker.exceptions.NoColorGivenException;
 
 /**
@@ -39,7 +39,6 @@ public class LogisticRabbit extends Worker {
 	private ContainerReference nestsCompletedContainer;
 	private ContainerReference nestsErrorContainer;
 	private boolean close;
-	private TransactionReference tx;
 	private Nest nest;
 
 
@@ -85,6 +84,8 @@ public class LogisticRabbit extends Worker {
 			e.printStackTrace();
 			this.close();
 		}
+		
+		this.increaseWorkerCount("logisticRabbit");
 	}
 	
 	/**

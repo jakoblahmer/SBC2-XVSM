@@ -12,9 +12,13 @@ import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.DefaultMzsCore;
+import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsConstants.Container;
 import org.mozartspaces.core.aspects.ContainerIPoint;
+import org.mozartspaces.core.aspects.SpaceIPoint;
+
+import sbc.model.lindamodel.WorkerCount;
 
 
 /**
@@ -60,6 +64,7 @@ public class Server {
 	// completed nests (tested && shipped nests are stored here)
 	private ContainerReference nestsCompletedRef;
 	private ContainerReference egssToColorRef;
+	private ContainerReference systemInfoRef;
 
 	
 	/**
@@ -141,11 +146,29 @@ public class Server {
         			}},
         			null, null);
         	
-        	// add aspect
+        	// number of workers etc is stored here
+        	systemInfoRef = Util.forceCreateContainer("systemInfo", 
+        			space, 
+        			capi, 
+        			Container.UNBOUNDED, 
+        			new ArrayList<Coordinator>() {{ 
+        				add(new AnyCoordinator());
+        				add(new QueryCoordinator());
+        			}},
+        			null, null);
+        	
+        	// add ID aspect (creates ids for products)
         	IdAspect aspect = new IdAspect();
-        	capi.addContainerAspect(aspect, egssToColorRef, new HashSet<ContainerIPoint>(){{ add(ContainerIPoint.PRE_WRITE); }}, null);
-        	capi.addContainerAspect(aspect, productsRef, new HashSet<ContainerIPoint>(){{ add(ContainerIPoint.PRE_WRITE); }}, null);
-        	capi.addContainerAspect(aspect, nestsRef, new HashSet<ContainerIPoint>(){{ add(ContainerIPoint.PRE_WRITE); }}, null);
+        	capi.addContainerAspect(aspect, egssToColorRef, ContainerIPoint.PRE_WRITE);
+        	capi.addContainerAspect(aspect, productsRef, ContainerIPoint.PRE_WRITE);
+        	capi.addContainerAspect(aspect, nestsRef, ContainerIPoint.PRE_WRITE);
+        	
+        	
+        	// create systemInfo objects
+        	capi.write(systemInfoRef, 0, null, new Entry(new WorkerCount("buildRabbit"), AnyCoordinator.newCoordinationData()));
+        	capi.write(systemInfoRef, 0, null, new Entry(new WorkerCount("colorRabbit"), AnyCoordinator.newCoordinationData()));
+        	capi.write(systemInfoRef, 0, null, new Entry(new WorkerCount("logisticRabbit"), AnyCoordinator.newCoordinationData()));
+        	capi.write(systemInfoRef, 0, null, new Entry(new WorkerCount("testRabbit"), AnyCoordinator.newCoordinationData()));
         	
 		} catch (MzsCoreException e) {
 			this.close();

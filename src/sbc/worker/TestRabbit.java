@@ -16,7 +16,7 @@ import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsConstants.TransactionTimeout;
 import org.mozartspaces.core.TransactionReference;
 
-import sbc.lindamodel.Nest;
+import sbc.model.lindamodel.Nest;
 import sbc.worker.exceptions.NoColorGivenException;
 
 /**
@@ -35,7 +35,6 @@ public class TestRabbit extends Worker {
 	private ContainerReference nestsContainer;
 //	private ContainerReference nestsErrorContainer;
 	private boolean close;
-	private TransactionReference tx;
 	private Nest nest;
 
 
@@ -74,12 +73,13 @@ public class TestRabbit extends Worker {
 		
 		try {
 			nestsContainer = capi.lookupContainer("nests", space, RequestTimeout.DEFAULT, null);
-//			nestsErrorContainer = capi.lookupContainer("nestsError", space, RequestTimeout.DEFAULT, null);
 		} catch (MzsCoreException e) {
 			System.out.println("ERROR ESTABLISHING CONNECTION TO CONTAINER");
 			e.printStackTrace();
 			this.close();
 		}
+		
+		this.increaseWorkerCount("testRabbit");
 	}
 	
 	/**

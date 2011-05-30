@@ -21,9 +21,9 @@ import org.mozartspaces.notifications.Operation;
 
 import sbc.gui.AdminGUI;
 import sbc.gui.ProducerInterface;
-import sbc.lindamodel.ChocolateRabbit;
-import sbc.lindamodel.Egg;
-import sbc.lindamodel.Nest;
+import sbc.model.lindamodel.ChocolateRabbit;
+import sbc.model.lindamodel.Egg;
+import sbc.model.lindamodel.Nest;
 import sbc.producer.Chicken;
 import sbc.producer.ChocolateRabbitRabbit;
 

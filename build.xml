@@ -72,6 +72,17 @@
 	</target>
 
 	
+	
+	<!-- LOAD BALANCING RABBIT -->
+	<target name="run-loadRabbit" depends="compile">
+		<java classname="sbc.loadbalancing.LoadBalancingRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<jvmarg value="-Dmozartspaces.configurationFile=${config.file}"/>
+			<arg line="1337 ${spaceURI}"/>
+		</java>
+	</target>
+	
 <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->

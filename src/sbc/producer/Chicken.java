@@ -10,7 +10,7 @@ import org.mozartspaces.core.MzsConstants.TransactionTimeout;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.TransactionReference;
 
-import sbc.lindamodel.Egg;
+import sbc.model.lindamodel.Egg;
 
 /**
  * creates eggs and places them in the "products" container

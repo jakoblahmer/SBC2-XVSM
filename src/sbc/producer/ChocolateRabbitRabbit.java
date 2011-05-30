@@ -9,7 +9,7 @@ import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsConstants.TransactionTimeout;
 import org.mozartspaces.core.TransactionReference;
 
-import sbc.lindamodel.ChocolateRabbit;
+import sbc.model.lindamodel.ChocolateRabbit;
 
 /**
  * produces choco rabbits

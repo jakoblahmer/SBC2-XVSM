@@ -24,9 +24,9 @@ import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.TransactionReference;
 
-import sbc.lindamodel.Egg;
 import sbc.model.Nest;
 import sbc.model.Product;
+import sbc.model.lindamodel.Egg;
 import sbc.worker.exceptions.NoColorGivenException;
 
 /**
@@ -45,7 +45,6 @@ public class ColorRabbit extends Worker {
 	private ContainerReference eggsToColorContainer;
 	private ContainerReference productsContainer;
 	private boolean close;
-	private TransactionReference tx;
 	private Egg egg;
 
 	
@@ -96,6 +95,8 @@ public class ColorRabbit extends Worker {
 			e.printStackTrace();
 			this.close();
 		}
+		
+		this.increaseWorkerCount("colorRabbit");
 	}
 	
 	/**
