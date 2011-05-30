@@ -18,7 +18,7 @@ import org.mozartspaces.core.MzsConstants.Container;
 import org.mozartspaces.core.aspects.ContainerIPoint;
 import org.mozartspaces.core.aspects.SpaceIPoint;
 
-import sbc.model.lindamodel.WorkerCount;
+import sbc.model.lindamodel.ObjectCount;
 
 
 /**
@@ -96,7 +96,6 @@ public class Server {
 	private void initXVSMContainers() {
 		// create products container
         try {
-        	
         	egssToColorRef = Util.forceCreateContainer("eggsToColor", 
         			space, 
         			capi, 
@@ -165,10 +164,10 @@ public class Server {
         	
         	
         	// create systemInfo objects
-        	capi.write(systemInfoRef, 0, null, new Entry(new WorkerCount("buildRabbit"), AnyCoordinator.newCoordinationData()));
-        	capi.write(systemInfoRef, 0, null, new Entry(new WorkerCount("colorRabbit"), AnyCoordinator.newCoordinationData()));
-        	capi.write(systemInfoRef, 0, null, new Entry(new WorkerCount("logisticRabbit"), AnyCoordinator.newCoordinationData()));
-        	capi.write(systemInfoRef, 0, null, new Entry(new WorkerCount("testRabbit"), AnyCoordinator.newCoordinationData()));
+        	capi.write(systemInfoRef, 0, null, new Entry(new ObjectCount("buildRabbit"), AnyCoordinator.newCoordinationData()));
+        	capi.write(systemInfoRef, 0, null, new Entry(new ObjectCount("colorRabbit"), AnyCoordinator.newCoordinationData()));
+        	capi.write(systemInfoRef, 0, null, new Entry(new ObjectCount("logisticRabbit"), AnyCoordinator.newCoordinationData()));
+        	capi.write(systemInfoRef, 0, null, new Entry(new ObjectCount("testRabbit"), AnyCoordinator.newCoordinationData()));
         	
 		} catch (MzsCoreException e) {
 			this.close();

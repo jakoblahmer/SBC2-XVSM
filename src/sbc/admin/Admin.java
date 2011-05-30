@@ -144,14 +144,13 @@ public class Admin implements ProducerInterface {
 							s = ((Entry) s).getValue();
 						}
 						if(s instanceof Egg)	{
-							if(arg1 == Operation.WRITE)
+							if(((Egg) s).getColor().isEmpty())	{
 								gui.updateEgg(1);
-							else if(arg1 == Operation.TAKE)
-								gui.updateEgg(-1);
+							}
 						}
 					}
 				}
-			}, Operation.WRITE, Operation.TAKE);
+			}, Operation.WRITE);
     		
     		
         	productsNotification = nm.createNotification(productsRef, new NotificationListener() {
@@ -165,6 +164,7 @@ public class Admin implements ProducerInterface {
 						
 						if(obj instanceof Egg)	{
 							gui.addColoredEgg(1);
+							gui.updateEgg(-1);
 						} else if(obj instanceof ChocolateRabbit)	{
 							gui.updateChoco(1);
 						} else	{
@@ -263,6 +263,7 @@ public class Admin implements ProducerInterface {
 		
 	}
 
+	
 	/**
 	 * interface method (callback for GUI)
 	 */

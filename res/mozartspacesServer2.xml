@@ -24,7 +24,7 @@
               0: a synchronous executor service without a thread pool is used.
             < 0: a cached thread pool (unbounded number of threads) is used.
         -->
-        <threads>10</threads>
+        <threads>-1</threads>
     </coreProcessor>
 
     <!-- Serializer configuration, multiple serializers are supported -->
@@ -61,7 +61,7 @@
                 <!-- the number of threads for the receiver/sender thread pool (configuration as for XP thread pool) -->
                 <threads>10</threads>
                 <!-- exclusive port to listen for incoming connections -->
-                <receiverPort>4242</receiverPort>
+                <receiverPort>9876</receiverPort>
                 <!-- the serializer to use, can be a serializer ID or a Apache Commons configuration as below -->
                 <serializer>${serializers.serializer(0)}</serializer>
             </tcpsocket>            

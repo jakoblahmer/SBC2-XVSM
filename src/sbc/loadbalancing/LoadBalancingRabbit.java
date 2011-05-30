@@ -8,12 +8,15 @@ import java.util.Map;
 
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.DefaultMzsCore;
+import org.mozartspaces.notifications.NotificationManager;
 
 /**
  * balances the products of more than 1 company
  */
 public class LoadBalancingRabbit implements ILoadBalancingCallback {
 
+	public static final int timout = 1000;
+	
 	public static void main(String[] args)	{
 		LoadBalancingRabbit lbr = new LoadBalancingRabbit(args);
 	}
@@ -26,6 +29,8 @@ public class LoadBalancingRabbit implements ILoadBalancingCallback {
 	private DefaultMzsCore core;
 
 	private Capi capi;
+
+	private NotificationManager nm;
 	
 	public LoadBalancingRabbit(String[] args)	{
 		spaceURIs = new HashMap<URI, LoadBalancingListener>();
@@ -44,8 +49,7 @@ public class LoadBalancingRabbit implements ILoadBalancingCallback {
 	 * @param args
 	 */
 	private void parseArguments(String[] args) {
-		/*** DISABLED FOR DEBUG **
-		
+//		/*** DISABLED FOR DEBUG **
 		if(args.length < 3)	{
 			throw new IllegalArgumentException("at least an ID and two XVSM URIs have to be given!");
 		}
@@ -74,6 +78,7 @@ public class LoadBalancingRabbit implements ILoadBalancingCallback {
 	        // Create an embedded space and construct a Capi instance for it
 	        core = DefaultMzsCore.newInstance();
 	        capi = new Capi(core);
+	        nm = new NotificationManager(core);
 		} catch(Exception e)	{
 			System.out.println("ERROR: " + e.getCause());
 		}
@@ -88,7 +93,7 @@ public class LoadBalancingRabbit implements ILoadBalancingCallback {
 	private void startListeners() {
 		LoadBalancingListener lbl;
 		for(URI uri : spaceURIs.keySet())	{
-			lbl = new LoadBalancingListener(this, uri, this.capi);
+			lbl = new LoadBalancingListener(this, uri, this.capi, this.nm);
 			lbl.start();
 		}
 	}

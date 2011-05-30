@@ -13,7 +13,7 @@
 <!-- This default configuration is also contained in the code and used when no configuration file is found -->
 
 	<!-- Determines whether the core has an embedded space or is just a thin client -->
-	<embeddedSpace>false</embeddedSpace>
+	<embeddedSpace>true</embeddedSpace>
 	
     <!-- Core Processor (XP) configuration -->
     <coreProcessor>
@@ -61,7 +61,7 @@
                 <!-- the number of threads for the receiver/sender thread pool (configuration as for XP thread pool) -->
                 <threads>10</threads>
                 <!-- exclusive port to listen for incoming connections -->
-                <receiverPort>0</receiverPort>
+                <receiverPort>4242</receiverPort>
                 <!-- the serializer to use, can be a serializer ID or a Apache Commons configuration as below -->
                 <serializer>${serializers.serializer(0)}</serializer>
             </tcpsocket>            

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SBC2_XVSM_SERVER2" default="" basedir=".">
+	
+	<!-- start space -->
+	<target name="run-space">
+		<java classname="sbc.spaceServer.Server"
+				fork="true"
+				classpathref="classpath">
+			<jvmarg value="-Dmozartspaces.configurationFile=${s2.configServer.file}"/>
+			<arg line="${s2.spaceURI}"/>
+		</java>
+	</target>
+	
+	<target name="run-admin">
+		<java classname="sbc.admin.Admin" 
+			fork="true"
+			classpathref="classpath">
+			<jvmarg value="-Dmozartspaces.configurationFile=${s2.config.file}"/>
+			<arg line="${s2.spaceURI}"/>
+		</java>
+	</target>
+	
+	<!-- SHOULD NOT BE USED DIRECTLY -->
+	<target name="run-chicken">
+		<java classname="sbc.producer.Chicken" 
+			fork="true"
+			classpathref="classpath">
+			<jvmarg value="-Dmozartspaces.configurationFile=${s2.config.file}"/>
+			<arg line="1 3 ${s2.spaceURI}"/>
+		</java>
+	</target>
+
+	<!-- SHOULD NOT BE USED DIRECTLY -->
+	<target name="run-chocolate">
+		<java classname="sbc.producer.ChocolateRabbitRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="2 3 ${s2.spaceURI}"/>
+		</java>
+	</target>
+
+	
+	<target name="run-colorRabbit">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="1 ${s2.spaceURI} RED"/>
+		</java>
+	</target>
+	
+	<target name="run-colorRabbit2">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="2 ${s2.spaceURI} GREEN"/>
+		</java>
+	</target>
+
+	<target name="run-colorRabbit3">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="42 ${s2.spaceURI} BLUE"/>
+		</java>
+	</target>
+	
+	<target name="run-colorRabbit4">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="24 ${s2.spaceURI} YELLOW"/>
+		</java>
+	</target>
+	
+	
+	
+	<target name="run-buildRabbit">
+		<java classname="sbc.worker.BuildRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="3 ${s2.spaceURI}"/>
+		</java>
+	</target>
+
+	<target name="run-buildRabbit2">
+		<java classname="sbc.worker.BuildRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="4 ${s2.spaceURI}"/>
+		</java>
+	</target>
+	
+	<target name="run-testRabbit">
+		<java classname="sbc.worker.TestRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="10 ${s2.spaceURI}"/>
+		</java>
+	</target>
+	
+	<target name="run-testRabbit2">
+		<java classname="sbc.worker.TestRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="12 ${s2.spaceURI}"/>
+		</java>
+	</target>
+	
+	<target name="run-logisticRabbit">
+		<java classname="sbc.worker.LogisticRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="5 ${s2.spaceURI}"/>
+		</java>
+	</target>
+	
+	<target name="run-logisticRabbit2">
+		<java classname="sbc.worker.LogisticRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="6 ${s2.spaceURI}"/>
+		</java>
+	</target>
+	
+</project>

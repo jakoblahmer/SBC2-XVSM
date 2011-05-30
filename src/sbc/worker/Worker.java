@@ -18,7 +18,7 @@ import org.mozartspaces.core.TransactionReference;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsConstants.TransactionTimeout;
 
-import sbc.model.lindamodel.WorkerCount;
+import sbc.model.lindamodel.ObjectCount;
 
 /**
  * abstract class for worker
@@ -112,11 +112,11 @@ public abstract class Worker {
 			
 			tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
 			
-			ArrayList<Serializable> entryarray = capi.take(loadbalancingRef, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+			ArrayList<Serializable> entryarray = capi.take(loadbalancingRef, QueryCoordinator.newSelector(query), RequestTimeout.INFINITE, tx);
 			
 			Serializable elem = entryarray.get(0);
-			if(elem instanceof WorkerCount)	{
-				WorkerCount model = (WorkerCount) elem;
+			if(elem instanceof ObjectCount)	{
+				ObjectCount model = (ObjectCount) elem;
 				model.increaseCount();
 				capi.write(loadbalancingRef, 0, tx, new Entry(model, QueryCoordinator.newCoordinationData()));
 				capi.commitTransaction(tx);

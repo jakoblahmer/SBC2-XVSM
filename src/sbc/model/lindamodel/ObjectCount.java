@@ -7,7 +7,7 @@ import org.mozartspaces.capi3.Queryable;
 
 @Queryable
 @Index(label="WorkerCount.class")
-public class WorkerCount implements Serializable {
+public class ObjectCount implements Serializable {
 
 	private static final long serialVersionUID = -5909752222883953631L;
 	
@@ -19,7 +19,7 @@ public class WorkerCount implements Serializable {
 	
 	private int count;
 	
-	public WorkerCount(String name)	{
+	public ObjectCount(String name)	{
 		this.name = name;
 		this.changed = false;
 		this.count = 0;
