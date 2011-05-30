@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.DefaultMzsCore;
@@ -16,6 +18,10 @@ import org.mozartspaces.notifications.NotificationManager;
 public class LoadBalancingRabbit implements ILoadBalancingCallback {
 
 	public static final int timout = 1000;
+
+	public static final int maxEggFactor = 10;
+	public static final int maxEggColoredFactor = 6;
+	public static final int maxChocoRabbitFactor = 5;
 	
 	public static void main(String[] args)	{
 		LoadBalancingRabbit lbr = new LoadBalancingRabbit(args);
@@ -95,15 +101,53 @@ public class LoadBalancingRabbit implements ILoadBalancingCallback {
 		for(URI uri : spaceURIs.keySet())	{
 			lbl = new LoadBalancingListener(this, uri, this.capi, this.nm);
 			lbl.start();
+			spaceURIs.put(uri, lbl);
 		}
 	}
 
 	
 	@Override
 	public void checkLoadBalance() {
-		// TODO Auto-generated method stub
+		
+		List<LoadBalancingListener> needEggs, needColoredEggs, needChocoRabbits, hasEggs, hasColoredEggs, hasChocoRabbits;
+		needEggs = needColoredEggs = needChocoRabbits = hasEggs = hasColoredEggs = hasChocoRabbits = new ArrayList<LoadBalancingListener>();
+		
+		int index = 0;
+		for(LoadBalancingListener lbl : spaceURIs.values())	{
+			if(lbl.getEggFactor() > 0)	{
+				// TODO set to correct position in list
+				index = 0;
+				for(LoadBalancingListener tmp : hasEggs)	{
+					if(tmp.getEggFactor() > lbl.getEggFactor())
+						index = hasEggs.indexOf(tmp) + 1;
+				}
+				hasEggs.add(index, lbl);
+			} else if(lbl.getEggFactor() < 0)	{
+				needEggs.add(lbl);
+			}
+			
+			if(lbl.getEggColoredFactor() > 0)	{
+				// TODO set to correct position in list
+				hasColoredEggs.add(lbl);
+			} else if(lbl.getEggColoredFactor() < 0)	{
+				needColoredEggs.add(lbl);
+			}
+			
+			if(lbl.getChocoRabbitFactor() > 0)	{
+				// TODO set to correct position in list
+				hasChocoRabbits.add(lbl);
+			} else if(lbl.getChocoRabbitFactor() < 0)	{
+				needChocoRabbits.add(lbl);
+			}
+		}
 		
 	}
+	
+	
+	
+	
+	
+	
 	
 	
 	

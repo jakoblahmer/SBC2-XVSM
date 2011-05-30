@@ -111,7 +111,6 @@ public class LoadBalancingListener extends Thread {
 		queryList.put("colorRabbit", colorRabbitQuery);
 		queryList.put("testRabbit", testRabbitQuery);
 		queryList.put("logisticRabbit", logisticRabbitQuery);
-		this.retrieveSystemInforations();
 	}
 	
 
@@ -146,6 +145,10 @@ public class LoadBalancingListener extends Thread {
 	 */
 	@Override
 	public void run()	{
+		
+		// retrieve worker information
+		this.retrieveSystemInforations();
+		
 		// start notifications
 		this.registerNotifications();
 		
@@ -154,6 +157,12 @@ public class LoadBalancingListener extends Thread {
 				// timout
 				sleep(LoadBalancingRabbit.timout);
 				
+				if(Math.abs(this.getEggColoredFactor()) < LoadBalancingRabbit.maxEggColoredFactor &&
+					Math.abs(this.getEggFactor()) < LoadBalancingRabbit.maxEggFactor &&
+					Math.abs(this.getChocoRabbitFactor()) < LoadBalancingRabbit.maxChocoRabbitFactor)	{
+					continue;
+				}
+				callback.checkLoadBalance();
 				
 			} catch (InterruptedException e) {
 				close = true;
@@ -261,6 +270,8 @@ public class LoadBalancingListener extends Thread {
 	public int getChocoRabbitFactor()	{
 		return this.workerCount.get("buildRabbit") - this.chocoRabbits;
 	}
+	
+	
 	
 	public int getEggs()	{
 		return this.eggs;
