@@ -112,10 +112,10 @@ public class LoadBalancingRabbit implements ILoadBalancingCallback {
 		List<LoadBalancingListener> needEggs, needColoredEggs, needChocoRabbits, hasEggs, hasColoredEggs, hasChocoRabbits;
 		needEggs = needColoredEggs = needChocoRabbits = hasEggs = hasColoredEggs = hasChocoRabbits = new ArrayList<LoadBalancingListener>();
 		
+		// create priority list for each product
 		int index = 0;
 		for(LoadBalancingListener lbl : spaceURIs.values())	{
 			if(lbl.getEggFactor() > 0)	{
-				// TODO set to correct position in list
 				index = 0;
 				for(LoadBalancingListener tmp : hasEggs)	{
 					if(tmp.getEggFactor() > lbl.getEggFactor())
@@ -123,32 +123,122 @@ public class LoadBalancingRabbit implements ILoadBalancingCallback {
 				}
 				hasEggs.add(index, lbl);
 			} else if(lbl.getEggFactor() < 0)	{
-				needEggs.add(lbl);
+				index = 0;
+				for(LoadBalancingListener tmp : needEggs)	{
+					if(tmp.getEggFactor() < lbl.getEggFactor())
+						index = needEggs.indexOf(tmp) + 1;
+				}
+				needEggs.add(index, lbl);
 			}
 			
 			if(lbl.getEggColoredFactor() > 0)	{
-				// TODO set to correct position in list
-				hasColoredEggs.add(lbl);
+				index = 0;
+				for(LoadBalancingListener tmp : hasColoredEggs)	{
+					if(tmp.getEggColoredFactor() > lbl.getEggColoredFactor())
+						index = hasColoredEggs.indexOf(tmp) + 1;
+				}
+				hasColoredEggs.add(index, lbl);
 			} else if(lbl.getEggColoredFactor() < 0)	{
-				needColoredEggs.add(lbl);
+				index = 0;
+				for(LoadBalancingListener tmp : needColoredEggs)	{
+					if(tmp.getEggColoredFactor() < lbl.getEggColoredFactor())
+						index = needColoredEggs.indexOf(tmp) + 1;
+				}
+				needColoredEggs.add(index, lbl);
 			}
 			
 			if(lbl.getChocoRabbitFactor() > 0)	{
-				// TODO set to correct position in list
-				hasChocoRabbits.add(lbl);
+				index = 0;
+				for(LoadBalancingListener tmp : hasChocoRabbits)	{
+					if(tmp.getChocoRabbitFactor() > lbl.getChocoRabbitFactor())
+						index = hasChocoRabbits.indexOf(tmp) + 1;
+				}
+				hasChocoRabbits.add(index, lbl);
 			} else if(lbl.getChocoRabbitFactor() < 0)	{
+				index = 0;
+				for(LoadBalancingListener tmp : needChocoRabbits)	{
+					if(tmp.getChocoRabbitFactor() < lbl.getChocoRabbitFactor())
+						index = needChocoRabbits.indexOf(tmp) + 1;
+				}
 				needChocoRabbits.add(lbl);
 			}
 		}
 		
+		// for each resource decide what to transfer
+		LoadBalancingListener from, to;
+		
+		// #### EGG
+		if(!hasEggs.isEmpty() && !needEggs.isEmpty())	{
+			for(int i=0; i < hasEggs.size(); i++)	{
+				if(needEggs.size() <= i)	{
+					// break loop if no more eggs are needed
+					break;
+				}
+				from = hasEggs.get(i);
+				to = needEggs.get(i);
+				
+				// TODO verbesserungen des algorithmus notwendig
+				/*
+				if((to.getEggFactor() + from.getEggFactor()) < 0)	{
+					// more eggs needed
+				} else	{
+					// enough (too much) eggs are moved
+				}
+//				*/
+				from.moveTo(to, ProductType.EGG, from.getEggFactor());
+			}
+		}
+		
+		// #### COLORED EGG
+		if(!hasColoredEggs.isEmpty() && !needColoredEggs.isEmpty())	{
+			for(int i=0; i < hasColoredEggs.size(); i++)	{
+				if(needColoredEggs.size() <= i)	{
+					// break loop if no more eggs are needed
+					break;
+				}
+				from = hasColoredEggs.get(i);
+				to = needColoredEggs.get(i);
+				
+				// TODO verbesserungen des algorithmus notwendig
+				/*
+				if((to.getEggFactor() + from.getEggFactor()) < 0)	{
+					// more eggs needed
+				} else	{
+					// enough (too much) eggs are moved
+				}
+//				*/
+				from.moveTo(to, ProductType.COLORED_EGG, from.getEggColoredFactor());
+			}
+		}
+		
+		// #### CHOCO
+		if(!hasChocoRabbits.isEmpty() && !needChocoRabbits.isEmpty())	{
+			for(int i=0; i < hasChocoRabbits.size(); i++)	{
+				if(needChocoRabbits.size() <= i)	{
+					// break loop if no more eggs are needed
+					break;
+				}
+				from = hasChocoRabbits.get(i);
+				to = needChocoRabbits.get(i);
+				
+				// TODO verbesserungen des algorithmus notwendig
+				/*
+				if((to.getEggFactor() + from.getEggFactor()) < 0)	{
+					// more eggs needed
+				} else	{
+					// enough (too much) eggs are moved
+				}
+//				*/
+				from.moveTo(to, ProductType.EGG, from.getChocoRabbitFactor());
+			}
+		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
+
+
+
+
+
+
+
+

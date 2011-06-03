@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -14,15 +15,19 @@ import org.mozartspaces.capi3.Matchmakers;
 import org.mozartspaces.capi3.Property;
 import org.mozartspaces.capi3.Query;
 import org.mozartspaces.capi3.QueryCoordinator;
+import org.mozartspaces.capi3.QueryCoordinator.QuerySelector;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
+import org.mozartspaces.core.MzsConstants.TransactionTimeout;
 import org.mozartspaces.core.MzsCoreException;
+import org.mozartspaces.core.TransactionReference;
 import org.mozartspaces.notifications.Notification;
 import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
+import sbc.model.Product;
 import sbc.model.lindamodel.ChocolateRabbit;
 import sbc.model.lindamodel.Egg;
 import sbc.model.lindamodel.Nest;
@@ -56,7 +61,6 @@ public class LoadBalancingListener extends Thread {
 
 	private boolean close;
 
-
 	public LoadBalancingListener(ILoadBalancingCallback callback, URI spaceURI, Capi capi, NotificationManager nm)	{
 		this.callback = callback;
 		this.space = spaceURI;
@@ -75,9 +79,14 @@ public class LoadBalancingListener extends Thread {
 		this.eggsColored = 0;
 		this.chocoRabbits = 0;
 		
+		this.initSelectors();
+		
 		this.initListener();
 	}
 	
+	private void initSelectors() {
+	}
+
 	/**
 	 * 	- inits container references
 	 * 	- get number of workers (optional)
@@ -271,7 +280,94 @@ public class LoadBalancingListener extends Thread {
 		return this.workerCount.get("buildRabbit") - this.chocoRabbits;
 	}
 	
+	/**
+	 * moves the given amount of type to the target
+	 * 
+	 * @param target
+	 * @param type
+	 * @param amount
+	 */
+	public void moveTo(LoadBalancingListener target, ProductType type, int amount)	{
+		log.info("	MOVE: " + amount + " " + type + " to " + target.getSpaceURI().toString());
+
+		TransactionReference tx = null;
+		try {
+			tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
+			if(type == ProductType.EGG)	{
+				// take eggs from eggsToColor Container
+				Query query = new Query();
+				query.cnt(amount);
+				ArrayList<Serializable> obj = capi.take(eggsToColorContainer, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+				capi.commitTransaction(tx);
+				target.write(type, obj);
+			} else if(type == ProductType.COLORED_EGG)	{
+				// take colored eggs from products Container
+				Property eggColoredProperty = Property.forName("Egg.class", "colored");
+				Query query = new Query().filter(eggColoredProperty.equalTo(true));
+				query.cnt(amount);
+				ArrayList<Serializable> obj = capi.take(productsContainer, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+				capi.commitTransaction(tx);
+				target.write(type, obj);
+			} else if(type == ProductType.CHOCORABBIT)	{
+				// take choco rabbits from products Container
+				Property chocoProperty = Property.forName("ChocolateRabbit.class");
+				Query query = new Query().filter(chocoProperty.exists());
+				query.cnt(amount);
+				ArrayList<Serializable> obj = capi.take(productsContainer, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+				capi.commitTransaction(tx);
+				target.write(type, obj);
+			}
+		} catch (MzsCoreException e) {
+			try {
+				capi.rollbackTransaction(tx);
+			} catch (MzsCoreException e1) {
+			}
+		}
+	}
 	
+	
+	/**
+	 * writes objects to container, specified by product type
+	 * @param type
+	 * @param obj
+	 */
+	private void write(ProductType type, List<Serializable> obj) {
+		TransactionReference tx = null;
+		try {
+			tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
+			
+			if(type == ProductType.EGG)	{
+				writeToContainer(eggsToColorContainer, obj, tx);
+			} else if(type == ProductType.COLORED_EGG || type == ProductType.CHOCORABBIT)	{
+				writeToContainer(productsContainer, obj, tx);
+			}
+		} catch (MzsCoreException e) {
+			try {
+				capi.rollbackTransaction(tx);
+			} catch (MzsCoreException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * writes objects to given container
+	 * @param obj
+	 */
+	private void writeToContainer(ContainerReference ref, List<Serializable> obj, TransactionReference tx)	{
+		try {
+			for(Serializable entry : obj)	{
+				if(entry instanceof org.mozartspaces.core.Entry)	{
+					entry = ((org.mozartspaces.core.Entry) entry).getValue();
+				}
+					capi.write(new org.mozartspaces.core.Entry(entry), ref, RequestTimeout.TRY_ONCE, tx);
+			}
+		} catch (MzsCoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	public int getEggs()	{
 		return this.eggs;
@@ -284,6 +380,15 @@ public class LoadBalancingListener extends Thread {
 	public int getChocoRabbits()	{
 		return this.chocoRabbits;
 	}
+	
+	/**
+	 * returns the space URI
+	 * @return
+	 */
+	public URI getSpaceURI()	{
+		return this.space;
+	}
+	
 	
 	private void close() {
 		// TODO Auto-generated method stub
