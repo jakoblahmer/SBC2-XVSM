@@ -23,6 +23,8 @@ public abstract class Producer extends Thread {
 	protected Capi capi;
 	private DefaultMzsCore core;
 
+	protected boolean close = false;
+	
 	/**
 	 * constructor
 	 * @param args
@@ -41,7 +43,7 @@ public abstract class Producer extends Thread {
 	 * @param args
 	 */
 	private void parseArgs(String[] args) {
-		if(args.length < 4)	{
+		if(args.length < 2)	{
 			throw new IllegalArgumentException("expected parameters: 'id' 'numberOfElementsToProduce' 'failure rate' 'XVSM space URI'!");
 		}
 		try	{
@@ -51,21 +53,21 @@ public abstract class Producer extends Thread {
 		}
 		
 		try	{
-			this.productCount = Integer.parseInt(args[1]);
+			this.space = URI.create(args[1]);
+		} catch (Exception e)	{
+			throw new IllegalArgumentException("URI could not be parsed");
+		}
+		
+		try	{
+			this.productCount = Integer.parseInt(args[2]);
 		} catch (Exception e)	{
 			throw new IllegalArgumentException("amount has to be an integer");
 		}
 		
 		try	{
-			this.failureRate = Double.parseDouble(args[2]);
+			this.failureRate = Double.parseDouble(args[3]);
 		} catch (Exception e)	{
 			throw new IllegalArgumentException("failure rate has to be a float and must be 0 <= failure rate <= 1");
-		}
-		
-		try	{
-			this.space = URI.create(args[3]);
-		} catch (Exception e)	{
-			throw new IllegalArgumentException("URI could not be parsed");
 		}
 	}
 
@@ -94,6 +96,10 @@ public abstract class Producer extends Thread {
 		}
 	}
 
+	public void stopBenchmark()	{
+		this.close = true;
+	}
+	
 	/**
 	 * shutdown the producer
 	 */

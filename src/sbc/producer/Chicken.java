@@ -23,7 +23,7 @@ public class Chicken extends Producer {
 	private Egg egg;
 
 	private TransactionReference tx;
-	
+
 	/**
 	 * main class (NOT NEEDED - should be started via admin gui)
 	 * @param args
@@ -64,6 +64,24 @@ public class Chicken extends Producer {
 	 */
 	@Override
 	public void run() {
+		log.info("started");
+		// endless loop
+		if(productCount == -1)	{
+			log.info("started");
+			while(!close)	{
+				egg = new Egg(this.id, getRandomColorCount());
+				egg.setError(this.calculateDefect());
+				
+				try {
+					capi.write(container, 0, null, new Entry(egg, QueryCoordinator.newCoordinationData()));
+				} catch (MzsCoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			this.close();
+			return;
+		}
 		
 		log.info("#######################################");
 		log.info("###### chicken started (lay " + productCount + " eggs)");
@@ -82,7 +100,7 @@ public class Chicken extends Producer {
 				
 				capi.write(container, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
 				
-				log.info("###### EGG (" + (egg.getId()) + ") ("+(i+1) + "/" + productCount + ") done");
+				log.info("###### EGG ("+(i+1) + "/" + productCount + ") done");
 				log.info("#######################################");
 				
 				capi.commitTransaction(tx);

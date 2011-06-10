@@ -20,6 +20,15 @@
 		</java>
 	</target>
 	
+	<target name="run-benchmarkAdmin">
+		<java classname="sbc.admin.Admin" 
+			fork="true"
+			classpathref="classpath">
+			<jvmarg value="-Dmozartspaces.configurationFile=${config.file}"/>
+			<arg line="${spaceURI} 1 false 1 1"/>
+		</java>
+	</target>
+	
 	<!-- SHOULD NOT BE USED DIRECTLY -->
 	<target name="run-chicken">
 		<java classname="sbc.producer.Chicken" 

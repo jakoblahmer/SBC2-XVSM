@@ -4,12 +4,14 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.AnyCoordinator;
+import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsCoreException;
 import org.mozartspaces.core.MzsConstants.TransactionTimeout;
 import org.mozartspaces.core.TransactionReference;
 
 import sbc.model.lindamodel.ChocolateRabbit;
+import sbc.model.lindamodel.Egg;
 
 /**
  * produces choco rabbits
@@ -40,6 +42,25 @@ public class ChocolateRabbitRabbit extends Producer {
 	 */
 	@Override
 	public void run() {
+		
+		// endless loop
+		if(productCount == -1)	{
+			while(!close)	{
+				// id is set via space aspect
+				rabbit = new ChocolateRabbit(this.id);
+				rabbit.setError(this.calculateDefect());
+				
+				// add with any coordinator
+				try {
+					capi.write(container, 0, tx, new Entry(rabbit, AnyCoordinator.newCoordinationData()));
+				} catch (MzsCoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			this.close();
+			return;
+		}
 		
 		log.info("#######################################");
 		log.info("###### ChocolateRabbit started (make " + productCount + " ChocoRabbits)");

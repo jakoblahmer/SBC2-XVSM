@@ -58,6 +58,16 @@
 		</parallel>
 	</target>
 
+	<!-- starts the 3 benchmarks -->
+	<target name="run-benchmarkAdmins" depends="compile">
+		<parallel>
+			<ant target="s1.run-benchmarkAdmin" />
+			<!--			<ant target="s2.run-admin" /> -->
+			<!-- 			<ant target="s3.run-admin" /> -->
+		</parallel>
+	</target>
+	
+	
 	<!-- starts the 3 admin interfaces -->
 	<target name="run-admins" depends="compile">
 		<parallel>
@@ -111,6 +121,20 @@
 			<!-- 		<ant target="s3.run-testRabbit" /> -->
 		</parallel>
 	</target>
+	
+		
+	<!-- BENCHMARK SERVER -->
+	<target name="run-benchmark" depends="compile">
+		<java classname="sbc.benchmark.BenchmarkServer" 
+			fork="false"
+			classpathref="classpath">
+			<jvmarg value="-Dmozartspaces.configurationFile=${config.file}"/>
+			<arg line="4444 ${spaceURI} "/>
+			<!--			<arg line="4444 ${spaceURI} ${s2.spaceURI}"/> -->
+			<!-- 			<arg line="4444 ${spaceURI} ${s2.spaceURI} ${s3.spaceURI}"/> -->
+		</java>
+	</target>
+	
 	
 	<!-- LOAD BALANCING RABBIT -->
 	<target name="run-loadRabbit" depends="compile">
