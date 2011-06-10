@@ -70,10 +70,10 @@ public class Chicken extends Producer {
 		log.info("#######################################");
 		
 		for(int i=0; i < productCount; i++)	{
-			int sleep = new Random().nextInt(3) + 1;
+//			int sleep = new Random().nextInt(3) + 1;
 			try {
 				tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
-				sleep(sleep * 1000);
+//				sleep(sleep * 1000);
 				
 				
 				// egg id is set via space aspect
@@ -86,7 +86,8 @@ public class Chicken extends Producer {
 				log.info("#######################################");
 				
 				capi.commitTransaction(tx);
-				
+
+				/*
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -94,6 +95,7 @@ public class Chicken extends Producer {
 					capi.rollbackTransaction(tx);
 				} catch (MzsCoreException e1) {
 				}
+				*/
 			} catch (MzsCoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

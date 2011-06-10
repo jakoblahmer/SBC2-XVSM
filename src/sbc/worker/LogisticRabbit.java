@@ -114,8 +114,8 @@ public class LogisticRabbit extends Worker {
 					if(s instanceof Nest)	{
 						nest = (Nest) s;
 						log.info("GOT: Nest [id=" + nest.getId() + "]");
-						int sleep = new Random().nextInt(3) + 1;
-						Thread.sleep(sleep * 1000);
+//						int sleep = new Random().nextInt(3) + 1;
+//						Thread.sleep(sleep * 1000);
 						
 						nest.setShipped(true);
 						nest.setShipper_id(this.id);
@@ -143,12 +143,12 @@ public class LogisticRabbit extends Worker {
 				} catch (MzsCoreException e1) {
 				}
 				close = true;
-			} catch (InterruptedException e) {
-				try {
-					capi.rollbackTransaction(tx);
-				} catch (MzsCoreException e1) {
-				}
-				close = true;
+//			} catch (InterruptedException e) {
+//				try {
+//					capi.rollbackTransaction(tx);
+//				} catch (MzsCoreException e1) {
+//				}
+//				close = true;
 			}
 			
 		}
@@ -161,6 +161,7 @@ public class LogisticRabbit extends Worker {
 	@Override
 	protected void close()	{
     	log.info("SHUTTING DOWN....");
+    	this.decreseWorkerCount("logisticRabbit");
     	try {
     		// rollback transaction if active (can throw exception)
     		capi.rollbackTransaction(tx);

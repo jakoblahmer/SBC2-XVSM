@@ -123,8 +123,8 @@ public class ColorRabbit extends Worker {
 				ArrayList<Serializable> obj = capi.take(eggsToColorContainer, selector, RequestTimeout.INFINITE, tx);
 				for(Serializable s : obj)	{
 					log.info("GOT: " + s);
-					int sleep = new Random().nextInt(3) + 1;
-					Thread.sleep(sleep * 1000);
+//					int sleep = new Random().nextInt(3) + 1;
+//					Thread.sleep(sleep * 1000);
 					
 					if(s instanceof Egg)	{
 						
@@ -160,12 +160,12 @@ public class ColorRabbit extends Worker {
 				} catch (MzsCoreException e1) {
 				}
 				close = true;
-			} catch (InterruptedException e) {
-				try {
-					capi.rollbackTransaction(tx);
-				} catch (MzsCoreException e1) {
-				}
-				close = true;
+//			} catch (InterruptedException e) {
+//				try {
+//					capi.rollbackTransaction(tx);
+//				} catch (MzsCoreException e1) {
+//				}
+//				close = true;
 			}
 			
 		}
@@ -175,6 +175,7 @@ public class ColorRabbit extends Worker {
 	@Override
 	protected void close() {
     	log.info("SHUTTING DOWN....");
+    	this.decreseWorkerCount("colorRabbit");
     	try {
     		// rollback transaction if active (can throw exception)
     		capi.rollbackTransaction(tx);

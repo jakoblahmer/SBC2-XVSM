@@ -51,6 +51,13 @@ public class ObjectCount implements Serializable {
 		this.changed = true;
 	}
 	
+	public void decreaseCount()	{
+		this.count--;
+		if(count < 0)
+			count = 0;
+		this.changed = true;
+	}
+	
 	public boolean isChanged() {
 		return changed;
 	}

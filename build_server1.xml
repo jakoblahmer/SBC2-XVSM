@@ -16,7 +16,7 @@
 			fork="true"
 			classpathref="classpath">
 			<jvmarg value="-Dmozartspaces.configurationFile=${config.file}"/>
-			<arg line="${spaceURI}"/>
+			<arg line="${spaceURI} 1"/>
 		</java>
 	</target>
 	

@@ -103,6 +103,22 @@ public abstract class Worker {
 	 * retrieves the current amount of worker rabbits and increases the amount
 	 */
 	protected void increaseWorkerCount(String workerName) {
+		this.processWorkerCount(workerName, true);
+	}
+	
+	/**
+	 * retrieves the current amount of worker rabbits and decreases the amount
+	 */
+	protected void decreseWorkerCount(String workerName)	{
+		this.processWorkerCount(workerName, false);
+	}
+	
+	/**
+	 * processes the worker amount
+	 * @param workerName
+	 * @param increase
+	 */
+	private void processWorkerCount(String workerName, boolean increase)	{
 		try {
 			ContainerReference loadbalancingRef = capi.lookupContainer("systemInfo", space, RequestTimeout.DEFAULT, null);
 			Property countProperty = Property.forName("WorkerCount.class", "name");
@@ -117,7 +133,10 @@ public abstract class Worker {
 			Serializable elem = entryarray.get(0);
 			if(elem instanceof ObjectCount)	{
 				ObjectCount model = (ObjectCount) elem;
-				model.increaseCount();
+				if(increase)
+					model.increaseCount();
+				else
+					model.decreaseCount();
 				capi.write(loadbalancingRef, 0, tx, new Entry(model, QueryCoordinator.newCoordinationData()));
 				capi.commitTransaction(tx);
 			} else	{

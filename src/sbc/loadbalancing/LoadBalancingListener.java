@@ -128,9 +128,10 @@ public class LoadBalancingListener extends Thread {
 	 */
 	private void retrieveSystemInforations() {
 		// capi.take(loadbalancingRef, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
-		try {
-			for(Entry<String, Query> entry : queryList.entrySet())	{
+		for(Entry<String, Query> entry : queryList.entrySet())	{
+			try	{
 				ArrayList<Serializable> res = capi.read(systemInfoContainer, QueryCoordinator.newSelector(entry.getValue()), RequestTimeout.TRY_ONCE, null);
+				
 				if(res != null)	{
 					Serializable obj = res.get(0);
 					if(!(obj instanceof ObjectCount))	{
@@ -139,12 +140,13 @@ public class LoadBalancingListener extends Thread {
 					workerCount.put(entry.getKey(), ((ObjectCount) obj).getCountAndRemoveChanged());
 					log.info("set: " + entry.getKey() + " to: " + workerCount.get(entry.getKey()));
 				}
+			} catch (MzsCoreException e) {
+				// TODO Auto-generated catch block
+//				e.printStackTrace();
+				log.info("System Informations for " + entry.getKey() + " not available...");
+				workerCount.put(entry.getKey(), 0);
 			}
-		} catch (MzsCoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		
 	}
 
 	/**
@@ -166,11 +168,16 @@ public class LoadBalancingListener extends Thread {
 				// timout
 				sleep(LoadBalancingRabbit.timout);
 				
+				// retrieve system information here for current number of test / build / color / logistic rabbits
+				// performance?
+//				this.retrieveSystemInforations();
+				
 				if(Math.abs(this.getEggColoredFactor()) < LoadBalancingRabbit.maxEggColoredFactor &&
 					Math.abs(this.getEggFactor()) < LoadBalancingRabbit.maxEggFactor &&
 					Math.abs(this.getChocoRabbitFactor()) < LoadBalancingRabbit.maxChocoRabbitFactor)	{
 					continue;
 				}
+				log.info("CHECK BALANCE");
 				callback.checkLoadBalance();
 				
 			} catch (InterruptedException e) {
@@ -190,16 +197,16 @@ public class LoadBalancingListener extends Thread {
 							s = ((org.mozartspaces.core.Entry) s).getValue();
 						}
 						if(s instanceof Egg)	{
-							if(((Egg) s).getColor().isEmpty())	{
+							if(arg1 == Operation.WRITE)
 								eggs++;
-							}
+							else if(arg1 == Operation.TAKE)
+								eggs--;
 						}
 					}
 				}
-			}, Operation.WRITE);
-		
-		
-
+			}, Operation.WRITE, Operation.TAKE);
+			
+			
 			productsNotification = nm.createNotification(productsContainer, new NotificationListener() {
 				
 				@Override
@@ -211,7 +218,6 @@ public class LoadBalancingListener extends Thread {
 							Serializable obj = ((org.mozartspaces.core.Entry) s).getValue();
 							
 							if(obj instanceof Egg)	{
-								eggs--;
 								eggsColored++;
 							} else if(obj instanceof ChocolateRabbit)	{
 								chocoRabbits++;
@@ -255,7 +261,7 @@ public class LoadBalancingListener extends Thread {
 	 * 		- negative value: eggs are needed
 	 */
 	public int getEggFactor()	{
-		return this.workerCount.get("colorRabbit") - this.eggs;
+		return this.eggs - (2 * this.workerCount.get("colorRabbit")) - 1;
 	}
 	
 	/**
@@ -266,7 +272,7 @@ public class LoadBalancingListener extends Thread {
 	 * 		- negative value: colored eggs are needed
 	 */
 	public int getEggColoredFactor()	{
-		return (this.workerCount.get("buildRabbit") * 2) - this.eggsColored;
+		return this.eggsColored - (3 * this.workerCount.get("buildRabbit")) - 1;
 	}
 	
 	/**
@@ -277,7 +283,7 @@ public class LoadBalancingListener extends Thread {
 	 * 		- negative value: chocorabbits are needed
 	 */
 	public int getChocoRabbitFactor()	{
-		return this.workerCount.get("buildRabbit") - this.chocoRabbits;
+		return this.chocoRabbits - (2 * this.workerCount.get("buildRabbit")) - 1;
 	}
 	
 	/**
@@ -287,41 +293,65 @@ public class LoadBalancingListener extends Thread {
 	 * @param type
 	 * @param amount
 	 */
-	public void moveTo(LoadBalancingListener target, ProductType type, int amount)	{
-		log.info("	MOVE: " + amount + " " + type + " to " + target.getSpaceURI().toString());
+	public synchronized void moveTo(LoadBalancingListener target, ProductType type, int amount)	{
+		log.info(this.space + "	MOVE: " + amount + " " + type + " to " + target.getSpaceURI().toString());
 
 		TransactionReference tx = null;
 		try {
 			tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
+			
+			ArrayList<Serializable> objs = new ArrayList<Serializable>();
+			
 			if(type == ProductType.EGG)	{
 				// take eggs from eggsToColor Container
 				Query query = new Query();
-				query.cnt(amount);
-				ArrayList<Serializable> obj = capi.take(eggsToColorContainer, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+				query.cnt(1);
+				while(amount > 0)	{
+					ArrayList<Serializable> obj = capi.take(eggsToColorContainer, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+					if(obj == null)
+						break;
+					objs.addAll(obj);
+					amount -= obj.size(); 
+					log.info(this.space + "	TOOK 1 EGG");
+				}
 				capi.commitTransaction(tx);
-				target.write(type, obj);
 			} else if(type == ProductType.COLORED_EGG)	{
 				// take colored eggs from products Container
 				Property eggColoredProperty = Property.forName("Egg.class", "colored");
 				Query query = new Query().filter(eggColoredProperty.equalTo(true));
-				query.cnt(amount);
-				ArrayList<Serializable> obj = capi.take(productsContainer, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+				query.cnt(1);
+				while(amount > 0)	{
+					ArrayList<Serializable> obj = capi.take(productsContainer, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+					if(obj == null)
+						break;
+					objs.addAll(obj);
+					amount -= obj.size(); 
+					log.info(this.space + "	TOOK 1 COLORED EGG");
+				}
 				capi.commitTransaction(tx);
-				target.write(type, obj);
 			} else if(type == ProductType.CHOCORABBIT)	{
 				// take choco rabbits from products Container
 				Property chocoProperty = Property.forName("ChocolateRabbit.class");
 				Query query = new Query().filter(chocoProperty.exists());
-				query.cnt(amount);
-				ArrayList<Serializable> obj = capi.take(productsContainer, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+				query.cnt(1);
+				while(amount > 0)	{
+					ArrayList<Serializable> obj = capi.take(productsContainer, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+					if(obj == null)
+						break;
+					objs.addAll(obj);
+					amount -= obj.size(); 
+					log.info(this.space + "	TOOK 1 CHOCO");
+				}
 				capi.commitTransaction(tx);
-				target.write(type, obj);
 			}
+			// write objects to target container
+			target.write(type, objs);
 		} catch (MzsCoreException e) {
 			try {
 				capi.rollbackTransaction(tx);
 			} catch (MzsCoreException e1) {
 			}
+			log.info("COULD NOT TAKE ELEMENT FROM SPACE");
 		}
 	}
 	
@@ -331,23 +361,13 @@ public class LoadBalancingListener extends Thread {
 	 * @param type
 	 * @param obj
 	 */
-	private void write(ProductType type, List<Serializable> obj) {
-		TransactionReference tx = null;
-		try {
-			tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
-			
-			if(type == ProductType.EGG)	{
-				writeToContainer(eggsToColorContainer, obj, tx);
-			} else if(type == ProductType.COLORED_EGG || type == ProductType.CHOCORABBIT)	{
-				writeToContainer(productsContainer, obj, tx);
-			}
-		} catch (MzsCoreException e) {
-			try {
-				capi.rollbackTransaction(tx);
-			} catch (MzsCoreException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+	private synchronized void write(ProductType type, List<Serializable> obj) {
+		log.info(this.space + "	GET: " + obj.size() + " " + type);
+		
+		if(type == ProductType.EGG)	{
+			writeToContainer(eggsToColorContainer, obj);
+		} else if(type == ProductType.COLORED_EGG || type == ProductType.CHOCORABBIT)	{
+			writeToContainer(productsContainer, obj);
 		}
 	}
 
@@ -355,16 +375,26 @@ public class LoadBalancingListener extends Thread {
 	 * writes objects to given container
 	 * @param obj
 	 */
-	private void writeToContainer(ContainerReference ref, List<Serializable> obj, TransactionReference tx)	{
+	private void writeToContainer(ContainerReference ref, List<Serializable> obj)	{
+		TransactionReference tx = null;
 		try {
+			tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
+			
 			for(Serializable entry : obj)	{
+				log.info(this.space + "	WRITE " + entry);
 				if(entry instanceof org.mozartspaces.core.Entry)	{
 					entry = ((org.mozartspaces.core.Entry) entry).getValue();
 				}
 					capi.write(new org.mozartspaces.core.Entry(entry), ref, RequestTimeout.TRY_ONCE, tx);
 			}
+			
+			capi.commitTransaction(tx);
+			
 		} catch (MzsCoreException e) {
-			// TODO Auto-generated catch block
+			try {
+				capi.rollbackTransaction(tx);
+			} catch (MzsCoreException e1) {}
+			
 			e.printStackTrace();
 		}
 	}

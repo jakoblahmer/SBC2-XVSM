@@ -162,8 +162,8 @@ public class BuildRabbit extends Worker {
 				
 				Serializable s = obj.get(0);
 				
-				int sleep = new Random().nextInt(3) + 1;
-				Thread.sleep(sleep * 1000);
+//				int sleep = new Random().nextInt(3) + 1;
+//				Thread.sleep(sleep * 1000);
 				
 				if(s instanceof Egg)	{
 					log.info("###### received 1 EGG");
@@ -214,13 +214,13 @@ public class BuildRabbit extends Worker {
 				} catch (MzsCoreException e1) {
 				}
 				close = true;
-			} catch (InterruptedException e) {
-				try {
-					capi.rollbackTransaction(tx);
-					currentNest = null;
-				} catch (MzsCoreException e1) {
-				}
-				close = true;
+//			} catch (InterruptedException e) {
+//				try {
+//					capi.rollbackTransaction(tx);
+//					currentNest = null;
+//				} catch (MzsCoreException e1) {
+//				}
+//				close = true;
 			}
 		}
 		this.close();
@@ -232,6 +232,7 @@ public class BuildRabbit extends Worker {
 	@Override
 	protected void close()	{
     	log.info("SHUTTING DOWN....");
+    	this.decreseWorkerCount("buildRabbit");
     	try {
     		// rollback transaction if active (can throw exception)
     		capi.rollbackTransaction(tx);

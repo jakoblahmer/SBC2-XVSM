@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.DefaultMzsCore;
 import org.mozartspaces.notifications.NotificationManager;
@@ -17,9 +18,13 @@ import org.mozartspaces.notifications.NotificationManager;
  */
 public class LoadBalancingRabbit implements ILoadBalancingCallback {
 
-	public static final int timout = 1000;
+	private static boolean loadbalanceActive = false;
+	
+	public static final int timout = 3000;
 
-	public static final int maxEggFactor = 10;
+	private static Logger log = Logger.getLogger(LoadBalancingRabbit.class);
+	
+	public static final int maxEggFactor = 6;
 	public static final int maxEggColoredFactor = 6;
 	public static final int maxChocoRabbitFactor = 5;
 	
@@ -107,10 +112,18 @@ public class LoadBalancingRabbit implements ILoadBalancingCallback {
 
 	
 	@Override
-	public void checkLoadBalance() {
-		
+	public synchronized void checkLoadBalance() {
+		if(loadbalanceActive)	{
+			return;
+		}
+		loadbalanceActive = true;
 		List<LoadBalancingListener> needEggs, needColoredEggs, needChocoRabbits, hasEggs, hasColoredEggs, hasChocoRabbits;
-		needEggs = needColoredEggs = needChocoRabbits = hasEggs = hasColoredEggs = hasChocoRabbits = new ArrayList<LoadBalancingListener>();
+		needEggs = new ArrayList<LoadBalancingListener>();
+		needColoredEggs = new ArrayList<LoadBalancingListener>();
+		needChocoRabbits = new ArrayList<LoadBalancingListener>();
+		hasEggs = new ArrayList<LoadBalancingListener>();
+		hasColoredEggs = new ArrayList<LoadBalancingListener>();
+		hasChocoRabbits = new ArrayList<LoadBalancingListener>();
 		
 		// create priority list for each product
 		int index = 0;
@@ -162,6 +175,36 @@ public class LoadBalancingRabbit implements ILoadBalancingCallback {
 				}
 				needChocoRabbits.add(lbl);
 			}
+		}
+		
+		log.info("HAS EGGS:");
+		for(LoadBalancingListener lbl : hasEggs)	{
+			log.info("	" + lbl.getSpaceURI() + " " + lbl.getEggFactor());
+		}
+		
+		log.info("NEED EGGS:");
+		for(LoadBalancingListener lbl : needEggs)	{
+			log.info("	" + lbl.getSpaceURI() + " " + lbl.getEggFactor());
+		}
+		
+		log.info("HAS COL EGGS:");
+		for(LoadBalancingListener lbl : hasColoredEggs)	{
+			log.info("	" + lbl.getSpaceURI() + " " + lbl.getEggColoredFactor());
+		}
+		
+		log.info("NEED COL EGGS:");
+		for(LoadBalancingListener lbl : needColoredEggs)	{
+			log.info("	" + lbl.getSpaceURI() + " " + lbl.getEggColoredFactor());
+		}
+		
+		log.info("HAS CHOCO:");
+		for(LoadBalancingListener lbl : hasChocoRabbits)	{
+			log.info("	" + lbl.getSpaceURI() + " " + lbl.getChocoRabbitFactor());
+		}
+		
+		log.info("NEED CHOCO:");
+		for(LoadBalancingListener lbl : needChocoRabbits)	{
+			log.info("	" + lbl.getSpaceURI() + " " + lbl.getChocoRabbitFactor());
 		}
 		
 		// for each resource decide what to transfer
@@ -229,9 +272,11 @@ public class LoadBalancingRabbit implements ILoadBalancingCallback {
 					// enough (too much) eggs are moved
 				}
 //				*/
-				from.moveTo(to, ProductType.EGG, from.getChocoRabbitFactor());
+				from.moveTo(to, ProductType.CHOCORABBIT, from.getChocoRabbitFactor());
 			}
 		}
+		
+		loadbalanceActive = false;
 	}
 }
 

@@ -16,7 +16,7 @@
 			fork="true"
 			classpathref="classpath">
 			<jvmarg value="-Dmozartspaces.configurationFile=${s3.config.file}"/>
-			<arg line="${s3.spaceURI}"/>
+			<arg line="${s3.spaceURI} 3"/>
 		</java>
 	</target>
 	

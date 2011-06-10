@@ -2,7 +2,6 @@ package sbc.admin;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,6 +37,8 @@ public class Admin implements ProducerInterface {
 	
 	private static AtomicInteger chickenID = new AtomicInteger(0);
 	private static AtomicInteger chocoRabbitID = new AtomicInteger(0);
+
+	private static String id = "";
 	
 	private final static Double MAX_FAILURE_RATE = 0.5; 
 	
@@ -57,6 +58,11 @@ public class Admin implements ProducerInterface {
 		} catch (Exception e)	{
 			throw new IllegalArgumentException("URI could not be parsed");
 		}
+		
+		if(args.length > 1)	{
+			id = args[1];
+		}
+		
 		Admin admin = new Admin(space);
 	}
 
@@ -86,7 +92,7 @@ public class Admin implements ProducerInterface {
 	public Admin(URI space)	{
 		this.space = space;
 		
-		gui = new AdminGUI(this);
+		gui = new AdminGUI(this, id);
 		gui.start();
 		
 		this.initXVSMConnection();
@@ -144,13 +150,16 @@ public class Admin implements ProducerInterface {
 							s = ((Entry) s).getValue();
 						}
 						if(s instanceof Egg)	{
-							if(((Egg) s).getColor().isEmpty())	{
+							if(arg1 == Operation.WRITE)	{
 								gui.updateEgg(1);
+							}
+							else if(arg1 == Operation.TAKE)	{
+								gui.updateEgg(-1);
 							}
 						}
 					}
 				}
-			}, Operation.WRITE);
+			}, Operation.WRITE, Operation.TAKE);
     		
     		
         	productsNotification = nm.createNotification(productsRef, new NotificationListener() {
@@ -164,7 +173,6 @@ public class Admin implements ProducerInterface {
 						
 						if(obj instanceof Egg)	{
 							gui.addColoredEgg(1);
-							gui.updateEgg(-1);
 						} else if(obj instanceof ChocolateRabbit)	{
 							gui.updateChoco(1);
 						} else	{

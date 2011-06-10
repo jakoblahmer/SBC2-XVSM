@@ -46,11 +46,11 @@ public class ChocolateRabbitRabbit extends Producer {
 		log.info("#######################################");
 		
 		for(int i=0; i < productCount; i++)	{
-			int sleep = new Random().nextInt(3) + 1;
+//			int sleep = new Random().nextInt(3) + 1;
 			
 			try {
 				tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
-				sleep(sleep * 1000);
+//				sleep(sleep * 1000);
 				
 				// id is set via space aspect
 				rabbit = new ChocolateRabbit(this.id);
@@ -61,12 +61,12 @@ public class ChocolateRabbitRabbit extends Producer {
 				log.info("###### Choco Rabbit (" + (i + 1) + ") done");
 				log.info("#######################################");
 				capi.commitTransaction(tx);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				try {
-					capi.rollbackTransaction(tx);
-				} catch (MzsCoreException e1) {
-				}
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//				try {
+//					capi.rollbackTransaction(tx);
+//				} catch (MzsCoreException e1) {
+//				}
 			} catch (MzsCoreException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

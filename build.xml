@@ -54,7 +54,7 @@
 		<parallel>
 			<ant target="s1.run-space" />
 			<ant target="s2.run-space" />
-			<ant target="s3.run-space" />
+	<!--		<ant target="s3.run-space" /> -->
 		</parallel>
 	</target>
 
@@ -63,7 +63,7 @@
 		<parallel>
 			<ant target="s1.run-admin" />
 			<ant target="s2.run-admin" />
-			<ant target="s3.run-admin" />
+			<!-- 			<ant target="s3.run-admin" /> -->
 		</parallel>
 	</target>
 	
@@ -78,10 +78,10 @@
 			<ant target="s2.run-colorRabbit2" />
 			<ant target="s2.run-colorRabbit3" />
 			<ant target="s2.run-colorRabbit4" />
-			<ant target="s3.run-colorRabbit" />
+			<!-- 			<ant target="s3.run-colorRabbit" />
 			<ant target="s3.run-colorRabbit2" />
 			<ant target="s3.run-colorRabbit3" />
-			<ant target="s3.run-colorRabbit4" />
+			<ant target="s3.run-colorRabbit4" /> -->
 		</parallel>
 	</target>
 	
@@ -90,7 +90,7 @@
 		<parallel>
 			<ant target="s1.run-buildRabbit" />
 			<ant target="s2.run-buildRabbit" />
-			<ant target="s3.run-buildRabbit" />
+			<!-- 		<ant target="s3.run-buildRabbit" /> -->
 		</parallel>
 	</target>
 	
@@ -99,7 +99,7 @@
 		<parallel>
 			<ant target="s1.run-logisticRabbit" />
 			<ant target="s2.run-logisticRabbit" />
-			<ant target="s3.run-logisticRabbit" />
+			<!-- 		<ant target="s3.run-logisticRabbit" /> -->
 		</parallel>
 	</target>
 	
@@ -108,7 +108,7 @@
 		<parallel>
 			<ant target="s1.run-testRabbit" />
 			<ant target="s2.run-testRabbit" />
-			<ant target="s3.run-testRabbit" />
+			<!-- 		<ant target="s3.run-testRabbit" /> -->
 		</parallel>
 	</target>
 	
@@ -118,7 +118,8 @@
 			fork="true"
 			classpathref="classpath">
 			<jvmarg value="-Dmozartspaces.configurationFile=${config.file}"/>
-			<arg line="1337 ${spaceURI} ${s2.spaceURI} ${s3.spaceURI}"/>
+			<arg line="1337 ${spaceURI} ${s2.spaceURI}"/>
+			<!-- 			<arg line="1337 ${spaceURI} ${s2.spaceURI} ${s3.spaceURI}"/> -->
 		</java>
 	</target>
 	
