@@ -24,6 +24,7 @@ import org.mozartspaces.notifications.NotificationListener;
 import org.mozartspaces.notifications.NotificationManager;
 import org.mozartspaces.notifications.Operation;
 
+import sbc.benchmark.token.ResultEntry;
 import sbc.gui.AdminGUI;
 import sbc.gui.ProducerInterface;
 import sbc.model.lindamodel.ChocolateRabbit;
@@ -233,6 +234,15 @@ public class Admin implements ProducerInterface {
 		System.out.println("	error: " + error);
 		System.out.println("	---------------------");
 		System.out.println("	SUM: " + (error + completed));
+		
+		
+		try {
+			capi.write(systemRef, 0, null, new Entry(new ResultEntry(completed, error)));
+		} catch (MzsCoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/**
@@ -251,7 +261,7 @@ public class Admin implements ProducerInterface {
         try {
         	
         	eggsToColorRef = capi.lookupContainer("eggsToColor", space, RequestTimeout.DEFAULT, null);
-        	eggsPartlyColoredContainer = capi.lookupContainer("eggsPartlyColored", space, RequestTimeout.DEFAULT, null);
+//        	eggsPartlyColoredContainer = capi.lookupContainer("eggsPartlyColored", space, RequestTimeout.DEFAULT, null);
         	productsRef = capi.lookupContainer("products", space, RequestTimeout.DEFAULT, null);
         	nestsRef = capi.lookupContainer("nests", space, RequestTimeout.DEFAULT, null);
         	nestsCompletedRef = capi.lookupContainer("nestsCompleted", space, RequestTimeout.DEFAULT, null);

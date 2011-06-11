@@ -41,6 +41,8 @@ public class LogisticRabbit extends Worker {
 	private boolean close;
 	private Nest nest;
 
+	private int nests;
+
 
 
 	/**
@@ -97,6 +99,8 @@ public class LogisticRabbit extends Worker {
 		
 		log.info("########## AWAITING NESTS (close with Ctrl + C)");
 		
+		nests = 0;
+		
 		// check tested, but not shipped nest
 		/** CREATE QUERY SELECTOR **/
 		Property testedProp = Property.forName("Nest.class", "tested");
@@ -119,6 +123,8 @@ public class LogisticRabbit extends Worker {
 						
 						nest.setShipped(true);
 						nest.setShipper_id(this.id);
+						
+						nests++;
 						
 						// method name says everything
 						if(nest.isErrorFreeAndIsComplete())	{
@@ -160,6 +166,7 @@ public class LogisticRabbit extends Worker {
 	 */
 	@Override
 	protected void close()	{
+		System.out.println("NESTS: " + nests);
     	log.info("SHUTTING DOWN....");
     	this.decreseWorkerCount("logisticRabbit");
     	try {

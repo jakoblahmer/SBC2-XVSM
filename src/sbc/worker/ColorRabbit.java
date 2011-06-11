@@ -141,8 +141,8 @@ public class ColorRabbit extends Worker {
 						// if no partly colored egg is found, select a not colored egg
 						obj = capi.take(eggsToColorContainer, AnyCoordinator.newSelector(1), RequestTimeout.INFINITE, tx);
 					}
-				}				
-				
+				}
+			
 				for(Serializable s : obj)	{
 //					log.info("GOT: " + s);
 //					int sleep = new Random().nextInt(3) + 1;
@@ -169,6 +169,10 @@ public class ColorRabbit extends Worker {
 							// write egg to eggsPartlyColored container
 							capi.write(eggsPartlyColoredContainer, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
 						}
+//						} else	{
+//							// write egg to eggsPartlyColored container
+//							capi.write(eggsToColorContainer, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
+//						}
 						
 						log.info("WRITE: " + s);
 						egg = null;
@@ -180,6 +184,7 @@ public class ColorRabbit extends Worker {
 				}
 				capi.commitTransaction(tx);
 			} catch (MzsCoreException e) {
+				e.printStackTrace();
 				// close, when space is terminated
 				try {
 					capi.rollbackTransaction(tx);

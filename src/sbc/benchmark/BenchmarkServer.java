@@ -1,6 +1,8 @@
 package sbc.benchmark;
 
+import java.io.Serializable;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -8,6 +10,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
+import org.mozartspaces.capi3.Property;
+import org.mozartspaces.capi3.Query;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
@@ -16,6 +20,7 @@ import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
 import org.mozartspaces.core.MzsCoreException;
 
+import sbc.benchmark.token.ResultEntry;
 import sbc.benchmark.token.StartToken;
 import sbc.benchmark.token.StopToken;
 
@@ -71,10 +76,7 @@ public class BenchmarkServer {
 	 * starts the benchmark
 	 */
 	private void startBenchmark() {
-		log.info("START BENCHMARK");
-		// set counter to 0
-		this.completedNestCount = 0;
-		this.errorNestCount = 0;
+		System.out.println("START BENCHMARK");
 		
 		// NO TRANSACTION POSSIBLE BECAUSE
 		// TRANSACTIONS SUPPORT JUST 1 SPACE
@@ -84,6 +86,7 @@ public class BenchmarkServer {
 			
 			for(ContainerReference ref : spaces.values())	{
 					capi.write(ref, 0, null, new Entry(new StartToken(), QueryCoordinator.newCoordinationData()));
+					System.out.println("started: " + ref.getSpace());
 			}
 			
 		} catch (MzsCoreException e) {
@@ -96,7 +99,7 @@ public class BenchmarkServer {
 	 * stops the benchmark
 	 */
 	private void stopBenchmark() {
-		log.info("STOP BENCHMARK");
+		System.out.println("STOP BENCHMARK");
 		// NO TRANSACTION POSSIBLE BECAUSE
 		// TRANSACTIONS SUPPORT JUST 1 SPACE
 //		TransactionReference tx = capi.createTransaction(TransactionTimeout.INFINITE, spaces);
@@ -117,8 +120,42 @@ public class BenchmarkServer {
 	 * collect benchmark results
 	 */
 	private void collectResults() {
-		// TODO Auto-generated method stub
 		
+		Query query = new Query().filter(Property.forName("ResultEntry.class").exists());
+		query.cnt(1);
+		
+		ArrayList<Serializable> res = new ArrayList<Serializable>();
+		
+		try {
+			for(ContainerReference ref : spaces.values())	{
+				res.addAll(capi.take(ref, QueryCoordinator.newSelector(query), RequestTimeout.INFINITE, null));
+				System.out.println("received result: " + ref.getSpace());
+			}
+		} catch (MzsCoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		int completed = 0;
+		int error = 0;
+		
+		ResultEntry x;
+		
+		for(Serializable s : res)	{
+			if(s instanceof ResultEntry)	{
+				x = (ResultEntry) s;
+				completed += x.getCompletedNests();
+				error += x.getErrorNests();
+			}
+		}
+		
+		System.out.println("###################################");
+		System.out.println("### RESULT:");
+		System.out.println("###################################");
+		System.out.println("	completed: " + completed);
+		System.out.println("	error: " + error);
+		System.out.println("	---------------------");
+		System.out.println("	SUM: " + (error + completed));
 	}
 	
 	

@@ -53,8 +53,8 @@
 	<target name="run-spaces" depends="compile">
 		<parallel threadcount="3">
 			<ant target="s1.run-space" />
-			<!-- <ant target="s2.run-space" />
-			<ant target="s3.run-space" /> -->
+			<ant target="s2.run-space" />
+			<ant target="s3.run-space" />
 		</parallel>
 	</target>
 
@@ -62,8 +62,8 @@
 	<target name="run-benchmarkAdmins" depends="compile">
 		<parallel threadcount="3">
 			<ant target="s1.run-benchmarkAdmin" />
-			<!--			<ant target="s2.run-admin" /> -->
-			<!-- 			<ant target="s3.run-admin" /> -->
+			<ant target="s2.run-benchmarkAdmin" />
+			<ant target="s3.run-benchmarkAdmin" />
 		</parallel>
 	</target>
 	
@@ -72,26 +72,40 @@
 	<target name="run-admins" depends="compile">
 		<parallel threadcount="3">
 			<ant target="s1.run-admin" />
-			<!-- <ant target="s2.run-admin" />
-			 			<ant target="s3.run-admin" /> -->
+			<ant target="s2.run-admin" />
+			<ant target="s3.run-admin" />
 		</parallel>
 	</target>
 	
 	<!-- starts the color rabbits (3 x 4)-->
 	<target name="run-colorRabbits" depends="compile">
-		<parallel threadcount="4">
+		<parallel threadcount="24">
 			<ant target="s1.run-colorRabbit" />
 			<ant target="s1.run-colorRabbit2" />
 			<ant target="s1.run-colorRabbit3" />
 			<ant target="s1.run-colorRabbit4" />
-			<!--	<ant target="s2.run-colorRabbit" />
+			<ant target="s1.run-colorRabbit5" />
+			<ant target="s1.run-colorRabbit6" />
+			<ant target="s1.run-colorRabbit7" />
+			<ant target="s1.run-colorRabbit8" />
+			<ant target="s1.run-colorRabbit9" />
+			<ant target="s1.run-colorRabbit10" />
+			
+			<ant target="s2.run-colorRabbit" />
 			<ant target="s2.run-colorRabbit2" />
 			<ant target="s2.run-colorRabbit3" />
 			<ant target="s2.run-colorRabbit4" />
-			 			<ant target="s3.run-colorRabbit" />
+			<ant target="s2.run-colorRabbit5" />
+			<ant target="s2.run-colorRabbit6" />
+			
+ 			<ant target="s3.run-colorRabbit" />
 			<ant target="s3.run-colorRabbit2" />
 			<ant target="s3.run-colorRabbit3" />
-			<ant target="s3.run-colorRabbit4" /> -->
+			<ant target="s3.run-colorRabbit4" />
+ 			<ant target="s3.run-colorRabbit5" />
+			<ant target="s3.run-colorRabbit6" />
+			<ant target="s3.run-colorRabbit7" />
+			<ant target="s3.run-colorRabbit8" />
 		</parallel>
 	</target>
 	
@@ -99,8 +113,10 @@
 	<target name="run-buildRabbits" depends="compile">
 		<parallel threadcount="3">
 			<ant target="s1.run-buildRabbit" />
-			<!-- <ant target="s2.run-buildRabbit" />
-			 		<ant target="s3.run-buildRabbit" /> -->
+			
+			<ant target="s2.run-buildRabbit" />
+			
+			<ant target="s3.run-buildRabbit" />
 		</parallel>
 	</target>
 	
@@ -108,8 +124,11 @@
 	<target name="run-logisticRabbits" depends="compile">
 		<parallel threadcount="3">
 			<ant target="s1.run-logisticRabbit" />
-			<!-- <ant target="s2.run-logisticRabbit" />
-			 		<ant target="s3.run-logisticRabbit" /> -->
+			
+			<ant target="s2.run-logisticRabbit" />
+	 		
+			<ant target="s3.run-logisticRabbit" />
+	 		<ant target="s3.run-logisticRabbit2" />
 		</parallel>
 	</target>
 	
@@ -117,8 +136,13 @@
 	<target name="run-testRabbits" depends="compile">
 		<parallel threadcount="3">
 			<ant target="s1.run-testRabbit" />
-			<!-- <ant target="s2.run-testRabbit" />
-			 		<ant target="s3.run-testRabbit" /> -->
+			<ant target="s1.run-testRabbit2" />
+			
+			<ant target="s2.run-testRabbit" />
+			<ant target="s2.run-testRabbit2" />
+			
+			<ant target="s3.run-testRabbit" />
+			<ant target="s3.run-testRabbit2" />
 		</parallel>
 	</target>
 	
@@ -129,9 +153,9 @@
 			fork="false"
 			classpathref="classpath">
 			<jvmarg value="-Dmozartspaces.configurationFile=${config.file}"/>
-			<arg line="4444 ${spaceURI} "/>
+			<!-- <arg line="4444 ${spaceURI} "/> -->
 			<!--			<arg line="4444 ${spaceURI} ${s2.spaceURI}"/> -->
-			<!-- 			<arg line="4444 ${spaceURI} ${s2.spaceURI} ${s3.spaceURI}"/> -->
+			<arg line="4444 ${spaceURI} ${s2.spaceURI} ${s3.spaceURI}"/>
 		</java>
 	</target>
 	

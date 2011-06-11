@@ -22,12 +22,11 @@
 	</target>
 	
 	<target name="run-benchmarkAdmin">
-		<nice newpriority="5"/>
 		<java classname="sbc.admin.Admin" 
 			fork="true"
 			classpathref="classpath">
 			<jvmarg value="-Dmozartspaces.configurationFile=${config.file}"/>
-			<arg line="${spaceURI} 1 false 1 1"/>
+			<arg line="${spaceURI} 1 false 3 2"/>
 		</java>
 	</target>
 	
@@ -52,7 +51,6 @@
 
 	
 	<target name="run-colorRabbit">
-		<nice newpriority="5"/>
 		<java classname="sbc.worker.ColorRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -61,7 +59,6 @@
 	</target>
 	
 	<target name="run-colorRabbit2">
-		<nice newpriority="5"/>
 		<java classname="sbc.worker.ColorRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -70,7 +67,6 @@
 	</target>
 
 	<target name="run-colorRabbit3">
-		<nice newpriority="5"/>
 		<java classname="sbc.worker.ColorRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -79,7 +75,6 @@
 	</target>
 	
 	<target name="run-colorRabbit4">
-		<nice newpriority="5"/>
 		<java classname="sbc.worker.ColorRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -87,10 +82,57 @@
 		</java>
 	</target>
 	
+	<target name="run-colorRabbit5">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="50 ${spaceURI} RED"/>
+		</java>
+	</target>
+	
+	<target name="run-colorRabbit6">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="51 ${spaceURI} GREEN"/>
+		</java>
+	</target>
+
+	<target name="run-colorRabbit7">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="52 ${spaceURI} BLUE"/>
+		</java>
+	</target>
+	
+	<target name="run-colorRabbit8">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="53 ${spaceURI} YELLOW"/>
+		</java>
+	</target>
+	
+	<target name="run-colorRabbit9">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="54 ${spaceURI} BLUE"/>
+		</java>
+	</target>
+	
+	<target name="run-colorRabbit10">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="55 ${spaceURI} YELLOW"/>
+		</java>
+	</target>
+	
 	
 	
 	<target name="run-buildRabbit">
-		<nice newpriority="5"/>
 		<java classname="sbc.worker.BuildRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -99,7 +141,6 @@
 	</target>
 
 	<target name="run-buildRabbit2">
-		
 		<java classname="sbc.worker.BuildRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -108,7 +149,6 @@
 	</target>
 	
 	<target name="run-testRabbit">
-		<nice newpriority="5"/>
 		<java classname="sbc.worker.TestRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -125,7 +165,6 @@
 	</target>
 	
 	<target name="run-logisticRabbit">
-		<nice newpriority="5"/>
 		<java classname="sbc.worker.LogisticRabbit" 
 			fork="true"
 			classpathref="classpath">

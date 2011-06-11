@@ -20,6 +20,15 @@
 		</java>
 	</target>
 	
+	<target name="run-benchmarkAdmin">
+		<java classname="sbc.admin.Admin" 
+			fork="true"
+			classpathref="classpath">
+			<jvmarg value="-Dmozartspaces.configurationFile=${config.file}"/>
+			<arg line="${spaceURI} 1 false 6 3"/>
+		</java>
+	</target>
+	
 	<!-- SHOULD NOT BE USED DIRECTLY -->
 	<target name="run-chicken">
 		<java classname="sbc.producer.Chicken" 
@@ -72,6 +81,37 @@
 		</java>
 	</target>
 	
+	<target name="run-colorRabbit5">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="50 ${s3.spaceURI} RED"/>
+		</java>
+	</target>
+	
+	<target name="run-colorRabbit6">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="51 ${s3.spaceURI} GREEN"/>
+		</java>
+	</target>
+
+	<target name="run-colorRabbit7">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="52 ${s3.spaceURI} BLUE"/>
+		</java>
+	</target>
+	
+	<target name="run-colorRabbit8">
+		<java classname="sbc.worker.ColorRabbit" 
+			fork="true"
+			classpathref="classpath">
+			<arg line="53 ${s3.spaceURI} YELLOW"/>
+		</java>
+	</target>
 	
 	
 	<target name="run-buildRabbit">
