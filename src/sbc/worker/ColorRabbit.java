@@ -6,7 +6,9 @@ import java.util.Random;
 
 import org.apache.commons.collections.iterators.ArrayListIterator;
 import org.apache.log4j.Logger;
+import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.FifoCoordinator;
+import org.mozartspaces.capi3.LifoCoordinator;
 import org.mozartspaces.capi3.LindaCoordinator;
 import org.mozartspaces.capi3.Matchmakers;
 import org.mozartspaces.capi3.Property;
@@ -44,8 +46,12 @@ public class ColorRabbit extends Worker {
 	private String color;
 	private ContainerReference eggsToColorContainer;
 	private ContainerReference productsContainer;
+	private ContainerReference eggsPartlyColoredContainer;
 	private boolean close;
 	private Egg egg;
+
+	private ContainerReference eggsAlmostColoredContainer;
+
 
 	
 	/**
@@ -89,6 +95,8 @@ public class ColorRabbit extends Worker {
 		
 		try {
 			eggsToColorContainer = capi.lookupContainer("eggsToColor", space, RequestTimeout.DEFAULT, null);
+			eggsPartlyColoredContainer = capi.lookupContainer("eggsPartlyColored", space, RequestTimeout.DEFAULT, null);
+			eggsAlmostColoredContainer = capi.lookupContainer("eggsAlmostColored", space, RequestTimeout.DEFAULT, null);
 			productsContainer = capi.lookupContainer("products", space, RequestTimeout.DEFAULT, null);
 		} catch (MzsCoreException e) {
 			System.out.println("ERROR ESTABLISHING CONNECTION TO CONTAINER");
@@ -114,15 +122,29 @@ public class ColorRabbit extends Worker {
 				Matchmakers.not(colors.equalTo(this.color)) 
 		);
 		query.cnt(1);
-		QuerySelector selector = QueryCoordinator.newSelector(query,1);
 		
+		ArrayList<Serializable> obj;
 		while(!close)	{
 			try {
-				log.info("########## AWAITING EGGS");
+//				log.info("########## AWAITING EGGS");
 				tx = capi.createTransaction(TransactionTimeout.INFINITE, space);
-				ArrayList<Serializable> obj = capi.take(eggsToColorContainer, selector, RequestTimeout.INFINITE, tx);
+				
+				try	{
+					obj = capi.take(eggsAlmostColoredContainer, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+				} catch(MzsCoreException e)	{
+					// try to get an partly colored egg (higher priority)
+					try	{
+						obj = capi.take(eggsPartlyColoredContainer, QueryCoordinator.newSelector(query), RequestTimeout.TRY_ONCE, tx);
+	//					log.info("GOT PARTLY COLORED EGG: " + obj);
+					} catch(MzsCoreException e1)	{
+//						e1.printStackTrace();
+						// if no partly colored egg is found, select a not colored egg
+						obj = capi.take(eggsToColorContainer, AnyCoordinator.newSelector(1), RequestTimeout.INFINITE, tx);
+					}
+				}				
+				
 				for(Serializable s : obj)	{
-					log.info("GOT: " + s);
+//					log.info("GOT: " + s);
 //					int sleep = new Random().nextInt(3) + 1;
 //					Thread.sleep(sleep * 1000);
 					
@@ -140,9 +162,12 @@ public class ColorRabbit extends Worker {
 						// egg is completely colored => write to products container
 						if(egg.isColored())	{
 							capi.write(productsContainer, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
+						} else if(egg.getColor().size() >= 2)	{
+							// write egg to eggsPartlyColored container
+							capi.write(eggsAlmostColoredContainer, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
 						} else	{
-							// write egg to eggsToColor container
-							capi.write(eggsToColorContainer, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
+							// write egg to eggsPartlyColored container
+							capi.write(eggsPartlyColoredContainer, 0, tx, new Entry(egg, QueryCoordinator.newCoordinationData()));
 						}
 						
 						log.info("WRITE: " + s);
@@ -150,6 +175,7 @@ public class ColorRabbit extends Worker {
 					} else	{
 						log.error("GOT OBJECT, which is not an EGG");
 						capi.rollbackTransaction(tx);
+						return;
 					}
 				}
 				capi.commitTransaction(tx);

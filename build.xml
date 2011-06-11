@@ -51,16 +51,16 @@
 	
 	<!-- starts 3 spaces -->
 	<target name="run-spaces" depends="compile">
-		<parallel>
+		<parallel threadcount="3">
 			<ant target="s1.run-space" />
-			<ant target="s2.run-space" />
-	<!--		<ant target="s3.run-space" /> -->
+			<!-- <ant target="s2.run-space" />
+			<ant target="s3.run-space" /> -->
 		</parallel>
 	</target>
 
 	<!-- starts the 3 benchmarks -->
 	<target name="run-benchmarkAdmins" depends="compile">
-		<parallel>
+		<parallel threadcount="3">
 			<ant target="s1.run-benchmarkAdmin" />
 			<!--			<ant target="s2.run-admin" /> -->
 			<!-- 			<ant target="s3.run-admin" /> -->
@@ -70,25 +70,25 @@
 	
 	<!-- starts the 3 admin interfaces -->
 	<target name="run-admins" depends="compile">
-		<parallel>
+		<parallel threadcount="3">
 			<ant target="s1.run-admin" />
-			<ant target="s2.run-admin" />
-			<!-- 			<ant target="s3.run-admin" /> -->
+			<!-- <ant target="s2.run-admin" />
+			 			<ant target="s3.run-admin" /> -->
 		</parallel>
 	</target>
 	
 	<!-- starts the color rabbits (3 x 4)-->
 	<target name="run-colorRabbits" depends="compile">
-		<parallel>
+		<parallel threadcount="4">
 			<ant target="s1.run-colorRabbit" />
 			<ant target="s1.run-colorRabbit2" />
 			<ant target="s1.run-colorRabbit3" />
 			<ant target="s1.run-colorRabbit4" />
-			<ant target="s2.run-colorRabbit" />
+			<!--	<ant target="s2.run-colorRabbit" />
 			<ant target="s2.run-colorRabbit2" />
 			<ant target="s2.run-colorRabbit3" />
 			<ant target="s2.run-colorRabbit4" />
-			<!-- 			<ant target="s3.run-colorRabbit" />
+			 			<ant target="s3.run-colorRabbit" />
 			<ant target="s3.run-colorRabbit2" />
 			<ant target="s3.run-colorRabbit3" />
 			<ant target="s3.run-colorRabbit4" /> -->
@@ -97,28 +97,28 @@
 	
 	<!-- starts the build rabbits (3 x 1)-->
 	<target name="run-buildRabbits" depends="compile">
-		<parallel>
+		<parallel threadcount="3">
 			<ant target="s1.run-buildRabbit" />
-			<ant target="s2.run-buildRabbit" />
-			<!-- 		<ant target="s3.run-buildRabbit" /> -->
+			<!-- <ant target="s2.run-buildRabbit" />
+			 		<ant target="s3.run-buildRabbit" /> -->
 		</parallel>
 	</target>
 	
 	<!-- starts the logistic rabbits (3 x 1)-->
 	<target name="run-logisticRabbits" depends="compile">
-		<parallel>
+		<parallel threadcount="3">
 			<ant target="s1.run-logisticRabbit" />
-			<ant target="s2.run-logisticRabbit" />
-			<!-- 		<ant target="s3.run-logisticRabbit" /> -->
+			<!-- <ant target="s2.run-logisticRabbit" />
+			 		<ant target="s3.run-logisticRabbit" /> -->
 		</parallel>
 	</target>
 	
 	<!-- starts the test rabbits (3 x 1)-->
 	<target name="run-testRabbits" depends="compile">
-		<parallel>
+		<parallel threadcount="3">
 			<ant target="s1.run-testRabbit" />
-			<ant target="s2.run-testRabbit" />
-			<!-- 		<ant target="s3.run-testRabbit" /> -->
+			<!-- <ant target="s2.run-testRabbit" />
+			 		<ant target="s3.run-testRabbit" /> -->
 		</parallel>
 	</target>
 	

@@ -12,6 +12,7 @@
 	</target>
 	
 	<target name="run-admin">
+		
 		<java classname="sbc.admin.Admin" 
 			fork="true"
 			classpathref="classpath">
@@ -21,6 +22,7 @@
 	</target>
 	
 	<target name="run-benchmarkAdmin">
+		<nice newpriority="5"/>
 		<java classname="sbc.admin.Admin" 
 			fork="true"
 			classpathref="classpath">
@@ -50,6 +52,7 @@
 
 	
 	<target name="run-colorRabbit">
+		<nice newpriority="5"/>
 		<java classname="sbc.worker.ColorRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -58,6 +61,7 @@
 	</target>
 	
 	<target name="run-colorRabbit2">
+		<nice newpriority="5"/>
 		<java classname="sbc.worker.ColorRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -66,6 +70,7 @@
 	</target>
 
 	<target name="run-colorRabbit3">
+		<nice newpriority="5"/>
 		<java classname="sbc.worker.ColorRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -74,6 +79,7 @@
 	</target>
 	
 	<target name="run-colorRabbit4">
+		<nice newpriority="5"/>
 		<java classname="sbc.worker.ColorRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -84,6 +90,7 @@
 	
 	
 	<target name="run-buildRabbit">
+		<nice newpriority="5"/>
 		<java classname="sbc.worker.BuildRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -92,6 +99,7 @@
 	</target>
 
 	<target name="run-buildRabbit2">
+		
 		<java classname="sbc.worker.BuildRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -100,6 +108,7 @@
 	</target>
 	
 	<target name="run-testRabbit">
+		<nice newpriority="5"/>
 		<java classname="sbc.worker.TestRabbit" 
 			fork="true"
 			classpathref="classpath">
@@ -116,6 +125,7 @@
 	</target>
 	
 	<target name="run-logisticRabbit">
+		<nice newpriority="5"/>
 		<java classname="sbc.worker.LogisticRabbit" 
 			fork="true"
 			classpathref="classpath">

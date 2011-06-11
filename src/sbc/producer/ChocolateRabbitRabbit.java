@@ -45,6 +45,9 @@ public class ChocolateRabbitRabbit extends Producer {
 		
 		// endless loop
 		if(productCount == -1)	{
+			
+			int counter = 0;
+			
 			while(!close)	{
 				// id is set via space aspect
 				rabbit = new ChocolateRabbit(this.id);
@@ -56,6 +59,17 @@ public class ChocolateRabbitRabbit extends Producer {
 				} catch (MzsCoreException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				}
+				counter++;
+				
+				if(counter > 300)	{
+					try {
+						sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					counter = 0;
 				}
 			}
 			this.close();

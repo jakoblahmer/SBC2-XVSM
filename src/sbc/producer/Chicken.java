@@ -1,8 +1,12 @@
 package sbc.producer;
 
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
+import org.mozartspaces.capi3.AnyCoordinator;
+import org.mozartspaces.capi3.LifoCoordinator;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Entry;
 import org.mozartspaces.core.MzsConstants.RequestTimeout;
@@ -64,20 +68,38 @@ public class Chicken extends Producer {
 	 */
 	@Override
 	public void run() {
-		log.info("started");
 		// endless loop
 		if(productCount == -1)	{
-			log.info("started");
+			
+//			this.startLoopTimeout();
+			
+			int counter = 0;
+			
 			while(!close)	{
 				egg = new Egg(this.id, getRandomColorCount());
+//				egg = new Egg(this.id, 1);
 				egg.setError(this.calculateDefect());
 				
 				try {
-					capi.write(container, 0, null, new Entry(egg, QueryCoordinator.newCoordinationData()));
+					capi.write(container, 0, null, new Entry(egg, AnyCoordinator.newCoordinationData()));
 				} catch (MzsCoreException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				counter++;
+				
+				if(counter > 300)	{
+					log.info("SLEEP");
+					try {
+						sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					counter = 0;
+				}
+				
 			}
 			this.close();
 			return;

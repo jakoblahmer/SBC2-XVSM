@@ -59,7 +59,7 @@
             -->
             <tcpsocket scheme="xvsm">
                 <!-- the number of threads for the receiver/sender thread pool (configuration as for XP thread pool) -->
-                <threads>10</threads>
+                <threads>-1</threads>
                 <!-- exclusive port to listen for incoming connections -->
                 <receiverPort>4242</receiverPort>
                 <!-- the serializer to use, can be a serializer ID or a Apache Commons configuration as below -->

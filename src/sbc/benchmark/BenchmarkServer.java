@@ -49,11 +49,21 @@ public class BenchmarkServer {
 		log.info("# BENCHMARK SERVER ###################");
 		log.info("######################################");
 		log.info("# press ENTER to start benchmark...");
-		Scanner sc = new Scanner(System.in);
-		sc.nextLine();
+//		Scanner sc = new Scanner(System.in);
+//		sc.nextLine();
+		log.info("# benchmark started...");
 		this.startBenchmark();
-		benchmarkTimer = new Timer();
-		benchmarkTimer.schedule(new StopBenchmark(), 60000);
+//		benchmarkTimer = new Timer();
+//		benchmarkTimer.schedule(new StopBenchmark(), 60000);
+		try {
+			Thread.sleep(60000);
+			log.info("10 seconds");
+		} catch (InterruptedException e) {
+			this.stopBenchmark();
+		}
+		this.stopBenchmark();
+		
+		this.collectResults();
 	}
 
 
@@ -103,6 +113,15 @@ public class BenchmarkServer {
 		
 	}
 
+	/**
+	 * collect benchmark results
+	 */
+	private void collectResults() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 	/**
 	 * timerclass, called to stop the benchmark
 	 * @author ja

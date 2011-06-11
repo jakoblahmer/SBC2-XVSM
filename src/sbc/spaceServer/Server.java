@@ -7,6 +7,7 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 import org.mozartspaces.capi3.AnyCoordinator;
 import org.mozartspaces.capi3.Coordinator;
+import org.mozartspaces.capi3.LifoCoordinator;
 import org.mozartspaces.capi3.LindaCoordinator;
 import org.mozartspaces.capi3.QueryCoordinator;
 import org.mozartspaces.core.Capi;
@@ -65,6 +66,8 @@ public class Server {
 	private ContainerReference nestsCompletedRef;
 	private ContainerReference egssToColorRef;
 	private ContainerReference systemInfoRef;
+	private ContainerReference eggsPartlyColoredRef;
+	private ContainerReference eggsAlmostRef;
 
 	
 	/**
@@ -101,7 +104,25 @@ public class Server {
         			capi, 
         			Container.UNBOUNDED, 
         			new ArrayList<Coordinator>() {{ 
-						add(new QueryCoordinator());	// eggs to color selected via linda
+						add(new AnyCoordinator());		// uncolored eggs selected via any coordinator
+					}}, 
+					null, null);
+        	
+        	eggsPartlyColoredRef = Util.forceCreateContainer("eggsPartlyColored", 
+        			space, 
+        			capi, 
+        			Container.UNBOUNDED, 
+        			new ArrayList<Coordinator>() {{ 
+        				add(new QueryCoordinator());	// partly colored eggs selected via query coordinator
+        			}}, 
+        			null, null);
+        	
+        	eggsAlmostRef = Util.forceCreateContainer("eggsAlmostColored", 
+        			space, 
+        			capi, 
+        			Container.UNBOUNDED, 
+        			new ArrayList<Coordinator>() {{ 
+						add(new QueryCoordinator());	// partly colored eggs selected via query coordinator
 					}}, 
 					null, null);
         	

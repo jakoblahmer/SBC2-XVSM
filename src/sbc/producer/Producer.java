@@ -2,6 +2,8 @@ package sbc.producer;
 
 import java.net.URI;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.mozartspaces.core.Capi;
 import org.mozartspaces.core.ContainerReference;
@@ -24,6 +26,7 @@ public abstract class Producer extends Thread {
 	private DefaultMzsCore core;
 
 	protected boolean close = false;
+	private Timer ct;
 	
 	/**
 	 * constructor
@@ -96,7 +99,24 @@ public abstract class Producer extends Thread {
 		}
 	}
 
+	protected void startLoopTimeout()	{
+		ct = new Timer();
+		ct.schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				try {
+					sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}, 500, 500);
+	}
+	
 	public void stopBenchmark()	{
+		if(ct != null)
+			ct.cancel();
 		this.close = true;
 	}
 	

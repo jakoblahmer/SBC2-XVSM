@@ -31,7 +31,8 @@ public class Egg extends sbc.model.Egg {
 		super(producer, colorCount);
 		this.linda_color = new ArrayList<String>(colorCount);
 	}
-
+	
+	
 	@Override
 	public boolean isColored()	{
 		return linda_colored;
@@ -50,3 +51,4 @@ public class Egg extends sbc.model.Egg {
 		this.linda_colored = super.isColored();
 	}
 }
+

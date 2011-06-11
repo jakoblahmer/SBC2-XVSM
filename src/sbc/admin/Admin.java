@@ -115,14 +115,13 @@ public class Admin implements ProducerInterface {
 /** BENCHMARK VARIABLES **/
 	private int completedNestCount;
 	private int errorNestCount;
-	private Timer benchmarkTimer;
 
 	private ChocolateRabbitRabbit[] benchRabbits;
 	private Chicken[] benchChickens;
 
-	private Scanner sc;
-
 	private ContainerReference systemRef;
+
+	private ContainerReference eggsPartlyColoredContainer;
 
 	
 	/**
@@ -186,8 +185,11 @@ public class Admin implements ProducerInterface {
 			
 			try {
 				capi.take(systemRef, QueryCoordinator.newSelector(query), RequestTimeout.INFINITE, null);
+				log.info("STOP BENCHMARK");
 			} catch (MzsCoreException e) {
 				log.error("ERROR READING STOP TOKEN");
+				e.printStackTrace();
+				this.close();
 				return;
 			}
 			this.stopBenchmark();
@@ -202,11 +204,11 @@ public class Admin implements ProducerInterface {
 		// set counter to 0
 		this.completedNestCount = 0;
 		this.errorNestCount = 0;
-		for(ChocolateRabbitRabbit rb : benchRabbits)	{
-			rb.start();
-		}
 		for(Chicken ck : benchChickens)	{
 			ck.start();
+		}
+		for(ChocolateRabbitRabbit rb : benchRabbits)	{
+			rb.start();
 		}
 	}
 
@@ -225,14 +227,12 @@ public class Admin implements ProducerInterface {
 			ck.stopBenchmark();
 		}
 		
-		log.info("######################################");
-		log.info("# RESULT: ############################");
-		log.info("	completed: " + completed);
-		log.info("	error: " + error);
-		log.info("	---------------------");
-		log.info("	SUM: " + (error + completed));
-		
-		sc.close();
+		System.out.println("######################################");
+		System.out.println("# RESULT: ############################");
+		System.out.println("	completed: " + completed);
+		System.out.println("	error: " + error);
+		System.out.println("	---------------------");
+		System.out.println("	SUM: " + (error + completed));
 	}
 	
 	/**
@@ -251,6 +251,7 @@ public class Admin implements ProducerInterface {
         try {
         	
         	eggsToColorRef = capi.lookupContainer("eggsToColor", space, RequestTimeout.DEFAULT, null);
+        	eggsPartlyColoredContainer = capi.lookupContainer("eggsPartlyColored", space, RequestTimeout.DEFAULT, null);
         	productsRef = capi.lookupContainer("products", space, RequestTimeout.DEFAULT, null);
         	nestsRef = capi.lookupContainer("nests", space, RequestTimeout.DEFAULT, null);
         	nestsCompletedRef = capi.lookupContainer("nestsCompleted", space, RequestTimeout.DEFAULT, null);
@@ -300,6 +301,7 @@ public class Admin implements ProducerInterface {
 				}
 			}, Operation.WRITE);
         	
+        	
         	nestsErrorNotification = nm.createNotification(nestsErrorRef, new NotificationListener() {
 				
 				@Override
@@ -322,6 +324,22 @@ public class Admin implements ProducerInterface {
 					}
 				}
 			}, Operation.WRITE);
+        	
+//        	eggsToColorNotification = nm.createNotification(eggsPartlyColoredContainer, new NotificationListener() {
+//        		int partly = 0;
+//        		@Override
+//        		public void entryOperationFinished(Notification arg0, Operation arg1, List<? extends Serializable> arg2) {
+//        			for(Serializable s : arg2)	{
+//        				if(!(s instanceof Egg))	{
+//        					s = ((Entry) s).getValue();
+//        				}
+//        				if(s instanceof Egg)	{
+//        					partly++;
+//        					log.info("PARTLY (" + partly + "): " + s);
+//        				}
+//        			}
+//        		}
+//        	}, Operation.WRITE);
         	
 		} catch (MzsCoreException e) {
 			// TODO Auto-generated catch block
@@ -350,16 +368,11 @@ public class Admin implements ProducerInterface {
 							s = ((Entry) s).getValue();
 						}
 						if(s instanceof Egg)	{
-							if(arg1 == Operation.WRITE)	{
 								gui.updateEgg(1);
-							}
-							else if(arg1 == Operation.TAKE)	{
-								gui.updateEgg(-1);
-							}
 						}
 					}
 				}
-			}, Operation.WRITE, Operation.TAKE);
+			}, Operation.WRITE);
     		
     		
         	productsNotification = nm.createNotification(productsRef, new NotificationListener() {
